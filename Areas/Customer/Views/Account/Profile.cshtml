@@ -1,0 +1,306 @@
+﻿@using HamroGrocery.Models.Entities
+@model HamroGrocery.Models.ViewModels.CustomerProfileViewModel
+@{
+    ViewData["Title"] = "My Account - Hamro Grocery";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.0.0/fonts/remixicon.css" rel="stylesheet">
+
+<div class="container py-5">
+    <!-- Profile Header -->
+    <div class="row mb-5 align-items-center">
+        <div class="col-lg-4 text-center text-lg-start">
+            <div class="profile-avatar-wrapper position-relative d-inline-block">
+                <img src="@(Model.User.ProfilePictureUrl ?? "/images/default-avatar.png")"
+                     alt="Profile" class="profile-avatar">
+                <div class="loyalty-badge @Model.User.MembershipTier.ToString().ToLower()">
+                    @Model.User.MembershipTier
+                </div>
+            </div>
+            <h3 class="mt-3 mb-1">@Model.User.FullName</h3>
+            <p class="text-muted mb-2">@Model.User.Email</p>
+            <div class="d-flex align-items-center justify-content-center justify-content-lg-start gap-2">
+                <i class="ri-vip-crown-fill text-warning"></i>
+                <strong>@Model.User.LoyaltyPoints</strong> Loyalty Points
+            </div>
+        </div>
+
+        <div class="col-lg-8 mt-4 mt-lg-0">
+            <div class="row g-4 text-center text-lg-start">
+                <div class="col-6 col-md-4">
+                    <div class="stat-card">
+                        <i class="ri-shopping-bag-3-line fs-3 text-primary"></i>
+                        <h4 class="mb-0">@Model.TotalOrders</h4>
+                        <small>Total Orders</small>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4">
+                    <div class="stat-card">
+                        <i class="ri-money-dollar-circle-line fs-3 text-success"></i>
+                        <h4 class="mb-0">AUD @Model.User.TotalSpent:N2</h4>
+                        <small>Total Spent</small>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4">
+                    <div class="stat-card">
+                        <i class="ri-star-smile-line fs-3 text-warning"></i>
+                        <h4 class="mb-0">@Model.User.ReviewCount</h4>
+                        <small>Reviews</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="profile-tabs">
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="orders">My Orders</button>
+            <button class="tab-btn" data-tab="addresses">Address</button>
+            <button class="tab-btn" data data-tab="complaints">Complaints</button>
+            <button class="tab-btn" data-tab="settings">Settings</button>
+        </div>
+
+        <!-- Orders Tab -->
+        <div class="tab-content active" id="orders">
+            <h4 class="mb-4">Recent Orders</h4>
+            @if (Model.RecentOrders?.Any() == true)
+            {
+                @foreach (var order in Model.RecentOrders)
+                {
+                    var itemsCount = order.OrderItems?.Count ?? 0;
+                    <div class="order-card mb-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>#@order.OrderNumber</strong>
+                                <span class="badge @GetStatusClass(order.Status)">@order.Status</span>
+                                <div class="text-muted small mt-1">
+                                    @order.OrderDate:dd MMM yyyy • @itemsCount item@(itemsCount == 1 ? "" : "s")
+                                </div>
+                            </div>
+                            <strong>AUD @order.TotalAmount:N2</strong>
+                        </div>
+                        <div class="mt-3">
+                            <a asp-controller="Orders" asp-action="Details" asp-route-id="@order.Id"
+                               class="btn btn-sm btn-outline-primary">View Details</a>
+
+                            @if (order.Status == OrderStatus.Delivered)
+                            {
+                                <button class="btn btn-sm btn-outline-success ms-2">Write Review</button>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="text-center py-5 text-muted">
+                    <i class="ri-inbox-line fs-1"></i>
+                    <p>No orders yet. <a asp-controller="Products" asp-action="Index">Start shopping!</a></p>
+                </div>
+            }
+        </div>
+
+        <!-- Address Tab (Using User's built-in address fields) -->
+        <div class="tab-content" id="addresses">
+            <h4 class="mb-4">Delivery Address</h4>
+            @if (!string.IsNullOrWhiteSpace(Model.User.AddressLineOne))
+            {
+                <div class="address-card">
+                    <h6>@Model.User.FullName</h6>
+                    <p class="mb-1">@Model.User.AddressLineOne</p>
+                    @if (!string.IsNullOrWhiteSpace(Model.User.AddressLineTwo))
+                    {
+                        <p class="mb-1">@Model.User.AddressLineTwo</p>
+                    }
+                    <p class="mb-1">
+                        @(Model.User.City?.CityName ?? "Sydney"),
+                        @(Model.User.StateProvince?.StateName ?? "NSW")
+                        @Model.User.PostalCode
+                    </p>
+                    <small class="text-success"><i class="ri-check-fill"></i> Default Address</small>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">No address saved yet.</p>
+            }
+        </div>
+
+        <!-- Complaints Tab -->
+        <div class="tab-content" id="complaints">
+            <h4 class="mb-4">Send Feedback or Complaint</h4>
+            <form asp-controller="Account" asp-action="SubmitComplaint" method="post">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Order Number (optional)</label>
+                        <input type="text" class="form-control" name="OrderNumber" placeholder="#ORD-123456" />
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Subject</label>
+                        <select class="form-select" name="Subject">
+                            <option>Damaged Product</option>
+                            <option>Missing Items</option>
+                            <option>Late Delivery</option>
+                            <option>Wrong Item Received</option>
+                            <option>Suggestion</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Message</label>
+                        <textarea class="form-control" rows="5" name="Message" required
+                                  placeholder="Please explain the issue in detail..."></textarea>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="ri-send-plane-fill"></i> Submit Complaint
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content" id="settings">
+            <h4 class="mb-4">Account Settings</h4>
+            <form asp-controller="Account" asp-action="UpdateProfile" method="post">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label>First Name</label>
+                        <input type="text" class="form-control" name="FirstName" value="@Model.User.FirstName" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label>Last Name</label>
+                        <input type="text" class="form-control" name="LastName" value="@Model.User.LastName" required />
+                    </div>
+                    <div class="col-12">
+                        <label>Phone Number</label>
+                        <input type="tel" class="form-control" name="PhoneNumber" value="@Model.User.PhoneNumber" />
+                    </div>
+                    <div class="col-12">
+                        <label>Email</label>
+                        <input type="email" class="form-control" value="@Model.User.Email" disabled />
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mt-4">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary: #e74c3c;
+    }
+
+    .profile-avatar {
+        width: 130px;
+        height: 130px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid white;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    .loyalty-badge {
+        position: absolute;
+        bottom: 10px;
+        right: -10px;
+        background: linear-gradient(45deg,#1a1a1a,#333);
+        color: gold;
+        padding: 6px 12px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: bold;
+    }
+
+    .stat-card {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 16px;
+        transition: transform 0.2s;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+    .tab-nav {
+        display: flex;
+        gap: 8px;
+        border-bottom: 2px solid #eee;
+        margin-bottom: 30px;
+        overflow-x: auto;
+        padding-bottom: 5px;
+    }
+
+    .tab-btn {
+        padding: 12px 20px;
+        background: none;
+        border: none;
+        font-weight: 600;
+        color: #666;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s;
+    }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+    .tab-content {
+        display: none;
+        animation: fadeIn 0.4s;
+    }
+
+        .tab-content.active {
+            display: block;
+        }
+
+    .order-card, .address-card {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+</style>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.add('active');
+            });
+        });
+    </script>
+}
+
+@functions {
+    string GetStatusClass(OrderStatus status) => status switch
+    {
+        OrderStatus.Delivered => "bg-success",
+        OrderStatus.Pending => "bg-warning text-dark",
+        OrderStatus.Processing => "bg-info",
+        OrderStatus.Cancelled => "bg-danger",
+        OrderStatus.Shipped => "bg-primary",
+        _ => "bg-secondary"
+    };
+}

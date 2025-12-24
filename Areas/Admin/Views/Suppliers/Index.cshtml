@@ -1,0 +1,77 @@
+﻿@model IEnumerable<HamroGrocery.Models.Entities.Supplier>
+@{
+    ViewData["Title"] = "Suppliers";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">Suppliers</h2>
+                <div>
+                    <a href="#" class="btn btn-outline-primary btn-sm me-2">
+                        <i class="fas fa-filter"></i> Filter
+                    </a>
+                    <a href="@Url.Action("Create", "Suppliers", new { area = "Admin" })" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i> Add Supplier
+                    </a>
+                </div>
+            </div>
+
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Supplier Name</th>
+                                <th>Contact Person</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Payment Terms</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var supplier in Model)
+                            {
+                                <tr>
+                                    <td><strong>@supplier.SupplierName</strong></td>
+                                    <td>@supplier.ContactPerson</td>
+                                    <td>@supplier.Email</td>
+                                    <td>@supplier.Phone</td>
+                                    <td>@supplier.PaymentTermsDays days</td>
+                                    <td>
+                                        <span class="badge bg-@(supplier.IsActive ? "success" : "danger")">
+                                            @(supplier.IsActive ? "Active" : "Inactive")
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="@Url.Action("Details", new { id = supplier.Id })" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="@Url.Action("Edit", new { id = supplier.Id })" class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-truck fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No suppliers found</h4>
+                    <p class="text-muted">Suppliers will appear here when you add them.</p>
+                    <a href="@Url.Action("Create", "Suppliers", new { area = "Admin" })" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add First Supplier
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

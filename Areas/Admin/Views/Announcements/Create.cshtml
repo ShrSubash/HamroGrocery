@@ -1,0 +1,187 @@
+﻿@using HamroGrocery.Models.Entities
+@model HamroGrocery.Models.Entities.Announcement
+@{
+    ViewData["Title"] = "Create Announcement";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="mb-4">
+                <h2><i class="fas fa-bullhorn text-danger me-2"></i>Create Announcement</h2>
+                <p class="text-muted">Create a new system-wide notification</p>
+            </div>
+
+            <!-- Form Card -->
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <!-- Title -->
+                        <div class="mb-4">
+                            <label asp-for="Title" class="form-label fw-bold">
+                                <i class="fas fa-heading me-2 text-danger"></i>Title
+                            </label>
+                            <input asp-for="Title" class="form-control form-control-lg"
+                                   placeholder="e.g., Delivery Update, Special Offer..." />
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Message -->
+                        <div class="mb-4">
+                            <label asp-for="Message" class="form-label fw-bold">
+                                <i class="fas fa-comment me-2 text-danger"></i>Message
+                            </label>
+                            <textarea asp-for="Message" class="form-control" rows="4"
+                                      placeholder="Enter the announcement message..."></textarea>
+                            <span asp-validation-for="Message" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row">
+                            <!-- Type -->
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="Type" class="form-label fw-bold">
+                                    <i class="fas fa-tag me-2 text-danger"></i>Type
+                                </label>
+                                <select asp-for="Type" class="form-select" asp-items="Html.GetEnumSelectList<AnnouncementType>()">
+                                </select>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle"></i> Info (Blue), Warning (Yellow), Success (Green), Error (Red)
+                                </div>
+                            </div>
+
+                            <!-- Location -->
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="Location" class="form-label fw-bold">
+                                    <i class="fas fa-map-marker-alt me-2 text-danger"></i>Location
+                                </label>
+                                <select asp-for="Location" class="form-select" asp-items="Html.GetEnumSelectList<AnnouncementLocation>()">
+                                </select>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle"></i> Where to display the announcement
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Start Date -->
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="StartDate" class="form-label fw-bold">
+                                    <i class="fas fa-calendar-alt me-2 text-danger"></i>Start Date
+                                </label>
+                                <input asp-for="StartDate" type="datetime-local" class="form-control" />
+                                <span asp-validation-for="StartDate" class="text-danger small"></span>
+                            </div>
+
+                            <!-- End Date -->
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="EndDate" class="form-label fw-bold">
+                                    <i class="fas fa-calendar-times me-2 text-danger"></i>End Date (Optional)
+                                </label>
+                                <input asp-for="EndDate" type="datetime-local" class="form-control" />
+                                <span asp-validation-for="EndDate" class="text-danger small"></span>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle"></i> Leave empty for no expiration
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Priority -->
+                        <div class="mb-4">
+                            <label asp-for="Priority" class="form-label fw-bold">
+                                <i class="fas fa-sort-numeric-up me-2 text-danger"></i>Priority
+                            </label>
+                            <input asp-for="Priority" type="number" class="form-control" min="0" max="100" />
+                            <div class="form-text">
+                                <i class="fas fa-info-circle"></i> Higher numbers appear first (0-100)
+                            </div>
+                        </div>
+
+                        <!-- Is Active -->
+                        <div class="mb-4">
+                            <div class="form-check form-switch">
+                                <input asp-for="IsActive" class="form-check-input" type="checkbox"
+                                       style="width: 3rem; height: 1.5rem;" />
+                                <label asp-for="IsActive" class="form-check-label fw-bold ms-2">
+                                    <i class="fas fa-power-off me-2 text-success"></i>Active
+                                </label>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle"></i> Announcement will be visible when active and within date range
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex gap-3 justify-content-end mt-4">
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-save me-2"></i>Create Announcement
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Preview Card -->
+            <div class="card mt-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-eye me-2"></i>Preview</h5>
+                </div>
+                <div class="card-body">
+                    <div id="preview" class="text-center p-3 rounded" style="background: linear-gradient(135deg, #3498db, #2980b9); color: white;">
+                        <strong id="previewTitle">Your Title Here</strong>: <span id="previewMessage">Your message will appear here...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Live preview
+        const typeColors = {
+            'Info': 'linear-gradient(135deg, #3498db, #2980b9)',
+            'Warning': 'linear-gradient(135deg, #f39c12, #e67e22)',
+            'Success': 'linear-gradient(135deg, #27ae60, #2ecc71)',
+            'Error': 'linear-gradient(135deg, #e74c3c, #c0392b)'
+        };
+
+        document.getElementById('Title').addEventListener('input', function() {
+            document.getElementById('previewTitle').textContent = this.value || 'Your Title Here';
+        });
+
+        document.getElementById('Message').addEventListener('input', function() {
+            document.getElementById('previewMessage').textContent = this.value || 'Your message will appear here...';
+        });
+
+        document.getElementById('Type').addEventListener('change', function() {
+            const preview = document.getElementById('preview');
+            preview.style.background = typeColors[this.value] || typeColors['Info'];
+        });
+
+        // Set default dates
+        document.addEventListener('DOMContentLoaded', function() {
+            const now = new Date();
+            const startDate = document.getElementById('StartDate');
+            const endDate = document.getElementById('EndDate');
+
+            if (!startDate.value) {
+                startDate.value = now.toISOString().slice(0, 16);
+            }
+
+            if (!endDate.value) {
+                const weekLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+                endDate.value = weekLater.toISOString().slice(0, 16);
+            }
+        });
+    </script>
+}

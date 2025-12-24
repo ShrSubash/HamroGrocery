@@ -1,0 +1,475 @@
+﻿@using HamroGrocery.Models.Entities
+@model HamroGrocery.Models.ViewModels.CreatePurchaseOrderViewModel
+@{
+    ViewData["Title"] = "Create Purchase Order";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .page-header {
+        background: white;
+        border-radius: 16px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(52, 152, 219, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+        }
+
+    .form-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(52, 152, 219, 0.1);
+        overflow: hidden;
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+        .form-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+        }
+
+    .form-header {
+        padding: 20px 25px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        background: rgba(52, 152, 219, 0.02);
+    }
+
+    .form-body {
+        padding: 25px;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        padding: 12px 15px;
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+    .btn {
+        border-radius: 8px;
+        padding: 12px 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: linear-gradient(45deg, #3498db, #2980b9);
+        border: none;
+    }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+    .btn-success {
+        background: linear-gradient(45deg, #27ae60, #2ecc71);
+        border: none;
+    }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+
+    .btn-danger {
+        background: linear-gradient(45deg, #e74c3c, #c0392b);
+        border: none;
+    }
+
+    .items-section {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+
+    .item-row {
+        background: white;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+        .item-row:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+    .summary-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+
+    .summary-amount {
+        font-size: 2rem;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .product-select {
+        position: relative;
+    }
+
+    .product-info {
+        background: #e3f2fd;
+        border-radius: 6px;
+        padding: 10px;
+        margin-top: 10px;
+        font-size: 0.9rem;
+    }
+
+    .remove-item-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #e74c3c;
+        color: white;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+        .remove-item-btn:hover {
+            background: #c0392b;
+            transform: scale(1.1);
+        }
+
+    @@media (max-width: 768px) {
+        .form-body
+
+    {
+        padding: 15px;
+    }
+
+    .item-row {
+        padding: 10px;
+    }
+
+    .remove-item-btn {
+        position: static;
+        width: 100%;
+        height: auto;
+        border-radius: 6px;
+        margin-top: 10px;
+    }
+
+    }
+</style>
+
+<!-- Page Header -->
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2><i class="fas fa-plus-circle me-2" style="color: #3498db;"></i>Create Purchase Order</h2>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to List
+        </a>
+    </div>
+</div>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+    <!-- Basic Information -->
+    <div class="form-card">
+        <div class="form-header">
+            <h4 class="mb-0" style="color: #2c3e50; font-weight: 600;">
+                <i class="fas fa-info-circle me-2" style="color: #3498db;"></i>Purchase Order Information
+            </h4>
+        </div>
+        <div class="form-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="PONumber" class="form-label">PO Number</label>
+                        <input asp-for="PONumber" class="form-control" readonly />
+                        <span asp-validation-for="PONumber" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="SupplierId" class="form-label">Supplier</label>
+                        <select asp-for="SupplierId" class="form-select" asp-items="@(((List<Supplier>)ViewBag.Suppliers)?.Select(s => new SelectListItem { Value = s.Id.ToString(), Text = s.SupplierName }) ?? new List<SelectListItem>())">
+                            <option value="">Select Supplier</option>
+                        </select>
+                        <span asp-validation-for="SupplierId" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="OrderDate" class="form-label">Order Date</label>
+                        <input asp-for="OrderDate" type="date" class="form-control" />
+                        <span asp-validation-for="OrderDate" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="ExpectedDeliveryDate" class="form-label">Expected Delivery Date</label>
+                        <input asp-for="ExpectedDeliveryDate" type="date" class="form-control" />
+                        <span asp-validation-for="ExpectedDeliveryDate" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Notes" class="form-label">Notes</label>
+                <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Additional notes or requirements..."></textarea>
+                <span asp-validation-for="Notes" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Items Section -->
+    <div class="form-card">
+        <div class="form-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0" style="color: #2c3e50; font-weight: 600;">
+                    <i class="fas fa-boxes me-2" style="color: #3498db;"></i>Order Items
+                </h4>
+                <button type="button" class="btn btn-success btn-sm" onclick="addNewItem()">
+                    <i class="fas fa-plus me-2"></i>Add Item
+                </button>
+            </div>
+        </div>
+        <div class="form-body">
+            <div id="itemsContainer">
+                <!-- Items will be added dynamically -->
+            </div>
+
+            <div class="text-center mt-3" id="noItemsMessage">
+                <p class="text-muted">No items added yet. Click "Add Item" to start building your purchase order.</p>
+            </div>
+
+            <!-- Summary -->
+            <div class="summary-card" id="summaryCard" style="display: none;">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h5 class="mb-1">Total Items: <span id="totalItems">0</span></h5>
+                        <p class="mb-0">Total Quantity: <span id="totalQuantity">0</span></p>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="summary-amount">
+                            AUD <span id="totalAmount">0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex justify-content-end gap-3 mb-4">
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="fas fa-times me-2"></i>Cancel
+        </a>
+        <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
+            <i class="fas fa-save me-2"></i>Create Purchase Order
+        </button>
+    </div>
+</form>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        let itemCounter = 0;
+        let productVariations = [];
+
+        // Load product variations on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProductVariations();
+        });
+
+        function loadProductVariations() {
+            fetch('/Admin/PurchaseOrders/GetProductVariations')
+                .then(response => response.json())
+                .then(data => {
+                    productVariations = data;
+                })
+                .catch(error => {
+                    console.error('Error loading product variations:', error);
+                });
+        }
+
+        function addNewItem() {
+            const container = document.getElementById('itemsContainer');
+            const itemHtml = `
+                <div class="item-row" id="item-${itemCounter}">
+                    <button type="button" class="remove-item-btn" onclick="removeItem(${itemCounter})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Product</label>
+                            <select class="form-select product-select" name="Items[${itemCounter}].ProductVariationId" onchange="updateProductInfo(${itemCounter}, this.value)" required>
+                                <option value="">Select Product</option>
+                                ${productVariations.map(pv =>
+                                    `<option value="${pv.id}" data-price="${pv.price}" data-stock="${pv.currentStock}">
+                                        ${pv.displayName}
+                                    </option>`
+                                ).join('')}
+                            </select>
+                            <div id="productInfo-${itemCounter}" class="product-info" style="display: none;"></div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Quantity</label>
+                            <input type="number" class="form-control quantity-input" name="Items[${itemCounter}].Quantity" min="1" onchange="calculateItemTotal(${itemCounter})" required />
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Unit Cost</label>
+                            <input type="number" class="form-control unit-cost-input" name="Items[${itemCounter}].UnitCost" step="0.01" min="0.01" onchange="calculateItemTotal(${itemCounter})" required />
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Total</label>
+                            <input type="text" class="form-control item-total" id="itemTotal-${itemCounter}" readonly />
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.insertAdjacentHTML('beforeend', itemHtml);
+            itemCounter++;
+            updateNoItemsMessage();
+            updateSummary();
+        }
+
+        function removeItem(index) {
+            document.getElementById(`item-${index}`).remove();
+            updateNoItemsMessage();
+            updateSummary();
+        }
+
+        function updateProductInfo(itemIndex, productVariationId) {
+            const productInfo = document.getElementById(`productInfo-${itemIndex}`);
+            const unitCostInput = document.querySelector(`#item-${itemIndex} .unit-cost-input`);
+
+            if (productVariationId) {
+                const variation = productVariations.find(pv => pv.id == productVariationId);
+                if (variation) {
+                    productInfo.innerHTML = `
+                        <div class="row">
+                            <div class="col-6">
+                                <strong>Current Stock:</strong> ${variation.currentStock}
+                            </div>
+                            <div class="col-6">
+                                <strong>Reorder Point:</strong> ${variation.reorderPoint}
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <strong>Suggested Cost:</strong> AUD ${(variation.price * 0.6).toFixed(2)}
+                        </div>
+                    `;
+                    productInfo.style.display = 'block';
+
+                    // Set suggested unit cost (60% of selling price)
+                    unitCostInput.value = (variation.price * 0.6).toFixed(2);
+                    calculateItemTotal(itemIndex);
+                } else {
+                    productInfo.style.display = 'none';
+                }
+            } else {
+                productInfo.style.display = 'none';
+                unitCostInput.value = '';
+            }
+        }
+
+        function calculateItemTotal(itemIndex) {
+            const quantityInput = document.querySelector(`#item-${itemIndex} .quantity-input`);
+            const unitCostInput = document.querySelector(`#item-${itemIndex} .unit-cost-input`);
+            const totalInput = document.getElementById(`itemTotal-${itemIndex}`);
+
+            const quantity = parseFloat(quantityInput.value) || 0;
+            const unitCost = parseFloat(unitCostInput.value) || 0;
+            const total = quantity * unitCost;
+
+            totalInput.value = `AUD ${total.toFixed(2)}`;
+            updateSummary();
+        }
+
+        function updateNoItemsMessage() {
+            const container = document.getElementById('itemsContainer');
+            const message = document.getElementById('noItemsMessage');
+            const submitBtn = document.getElementById('submitBtn');
+
+            const hasItems = container.children.length > 0;
+            message.style.display = hasItems ? 'none' : 'block';
+            submitBtn.disabled = !hasItems;
+        }
+
+        function updateSummary() {
+            const container = document.getElementById('itemsContainer');
+            const summaryCard = document.getElementById('summaryCard');
+
+            if (container.children.length === 0) {
+                summaryCard.style.display = 'none';
+                return;
+            }
+
+            let totalItems = 0;
+            let totalQuantity = 0;
+            let totalAmount = 0;
+
+            Array.from(container.children).forEach(item => {
+                const quantityInput = item.querySelector('.quantity-input');
+                const unitCostInput = item.querySelector('.unit-cost-input');
+
+                const quantity = parseFloat(quantityInput?.value) || 0;
+                const unitCost = parseFloat(unitCostInput?.value) || 0;
+
+                if (quantity > 0 && unitCost > 0) {
+                    totalItems++;
+                    totalQuantity += quantity;
+                    totalAmount += quantity * unitCost;
+                }
+            });
+
+            document.getElementById('totalItems').textContent = totalItems;
+            document.getElementById('totalQuantity').textContent = totalQuantity;
+            document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
+
+            summaryCard.style.display = totalItems > 0 ? 'block' : 'none';
+        }
+
+        // Add initial item
+        setTimeout(() => {
+            if (productVariations.length > 0) {
+                addNewItem();
+            }
+        }, 500);
+    </script>
+}

@@ -1,0 +1,178 @@
+﻿@using HamroGrocery.Models.Entities
+@model IEnumerable<Order>
+@{
+    ViewData["Title"] = "My Orders";
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4 fw-bold text-danger">
+                <i class="fas fa-shopping-bag me-2"></i>My Orders
+            </h2>
+
+            @if (!Model.Any())
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-receipt fa-4x text-muted mb-4"></i>
+                    <h4>No orders yet</h4>
+                    <p class="text-muted">When you place an order, it will appear here.</p>
+                    <a asp-controller="Products" asp-action="Index" class="btn btn-danger btn-lg mt-3">
+                        <i class="fas fa-shopping-cart me-2"></i>Start Shopping
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="accordion" id="ordersAccordion">
+                    @foreach (var order in Model.OrderByDescending(o => o.OrderDate))
+                    {
+                        var statusColor = order.Status switch
+                        {
+                            OrderStatus.Pending => "warning",
+                            OrderStatus.Confirmed or OrderStatus.Processing => "info",
+                            OrderStatus.Shipped => "primary",
+                            OrderStatus.Delivered => "success",
+                            OrderStatus.Cancelled or OrderStatus.Refunded => "secondary",
+                            OrderStatus.Failed => "danger",
+                            _ => "dark"
+                        };
+
+                        <div class="card mb-3 border-0 shadow-sm rounded-3 overflow-hidden">
+                            <div class="card-header bg-white border-0 py-3" id="heading-@order.Id">
+                                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                                    <div>
+                                        <h5 class="mb-1 fw-bold">
+                                            Order #@order.OrderNumber
+                                            <small class="text-muted">• Placed on @order.OrderDate.ToString("dd MMM yyyy, hh:mm tt")</small>
+                                        </h5>
+                                        <div class="d-flex flex-wrap gap-3 mt-2">
+                                            <span class="badge bg-@statusColor text-white fs-6 px-3 py-2">
+                                                <i class="fas fa-circle-small me-1"></i>@order.Status
+                                            </span>
+                                            <span class="text-muted">
+                                                <i class="fas fa-items fa-fw me-1"></i>@order.TotalItems items
+                                            </span>
+                                            <span class="text-muted">
+                                                <i class="fas fa-truck fa-fw me-1"></i>@order.DeliveryMethod
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-md-end">
+                                        <h4 class="fw-bold text-danger mb-1">
+                                            $@order.TotalAmount.ToString("F2")
+                                        </h4>
+                                        <button class="btn btn-sm btn-outline-dark mt-2" type="button" data-bs-toggle="collapse"
+                                                data-bs-target="#collapse-@order.Id" aria-expanded="false">
+                                            <i class="fas fa-chevron-down me-1"></i>View Details
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="collapse-@order.Id" class="collapse" data-bs-parent="#ordersAccordion">
+                                <div class="card-body pt-0">
+                                    <!-- Order Items Grid -->
+                                    <div class="row g-3 mt-3">
+                                        @foreach (var item in order.OrderItems)
+                                        {
+                                            var product = item.Product;
+                                            if (product == null) continue;
+
+                                            <div class="col-6 col-md-4 col-lg-3">
+                                                <div class="border rounded-3 p-3 text-center bg-light h-100 d-flex flex-column justify-content-between">
+                                                    @if (!string.IsNullOrEmpty(product.ImagePath))
+                                                    {
+                                                        <img src="@product.ImagePath" alt="@product.ProductName"
+                                                             class="img-fluid rounded mb-3" style="height: 120px; object-fit: cover;">
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="bg-secondary bg-opacity-10 rounded mb-3 d-flex align-items-center justify-content-center"
+                                                             style="height: 120px;">
+                                                            <i class="fas fa-image fa-3x text-muted"></i>
+                                                        </div>
+                                                    }
+                                                    <div>
+                                                        <h6 class="mb-1 small fw-bold">@product.ProductName</h6>
+                                                        <p class="text-muted mb-2 small">
+                                                            @item.Quantity × $@item.UnitPrice.ToString("F2")
+                                                        </p>
+                                                        <p class="fw-bold text-danger small mb-0">
+                                                            $@((item.Quantity * item.UnitPrice).ToString("F2"))
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+
+                                    <hr class="my-4">
+
+                                    <!-- Order Summary & Actions -->
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6 class="fw-bold mb-3">
+                                                <i class="fas fa-map-marker-alt text-danger me-2"></i>
+                                                Delivery Address
+                                            </h6>
+                                            <p class="text-muted mb-1">@order.CustomerName</p>
+                                            <p class="text-muted mb-1">@order.ShippingAddress</p>
+                                            @if (!string.IsNullOrEmpty(order.ShippingSuburb))
+                                            {
+                                                <p class="text-muted mb-1">
+                                                    @order.ShippingSuburb, @order.ShippingCity @order.ShippingPostcode
+                                                </p>
+                                            }
+                                            <p class="text-muted"><i class="fas fa-phone me-1"></i>@order.CustomerPhone</p>
+                                        </div>
+
+                                        <div class="col-md-6 text-md-end mt-4 mt-md-0">
+                                            <div class="d-grid d-md-block gap-2">
+                                                @if (order.Status == OrderStatus.Delivered || order.Status == OrderStatus.Shipped)
+                                                {
+                                                    <form asp-controller="Cart" asp-action="BuyAgain" asp-route-orderId="@order.Id" method="post" class="d-inline">
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="submit" class="btn btn-danger btn-lg px-4">
+                                                            <i class="fas fa-redo me-2"></i>Buy Again
+                                                        </button>
+                                                    </form>
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn btn-danger btn-lg px-4" disabled>
+                                                        <i class="fas fa-redo me-2"></i>Buy Again
+                                                    </button>
+                                                    <small class="text-muted d-block mt-2">Available after delivery</small>
+                                                }
+
+                                                <a asp-controller="Orders" asp-action="Details" asp-route-id="@order.Id"
+                                                   class="btn btn-outline-dark mt-2">
+                                                    <i class="fas fa-receipt me-2"></i>View Invoice
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-expand latest delivered order
+        document.addEventListener('DOMContentLoaded', function () {
+            const latestDelivered = document.querySelector('.collapse.show') ||
+                                   document.querySelector('[data-bs-parent="#ordersAccordion"] .collapse');
+            if (latestDelivered) {
+                new bootstrap.Collapse(latestDelivered, { toggle: true });
+            }
+        });
+    </script>
+}

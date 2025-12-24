@@ -1,0 +1,401 @@
+﻿@model HamroGrocery.Models.Entities.Order
+@{
+    ViewData["Title"] = "Order Confirmation";
+}
+
+@section Styles {
+    <style>
+        .confirmation-container {
+            padding: 60px 0;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 80vh;
+        }
+
+        .confirmation-card {
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            animation: scaleIn 0.5s ease;
+        }
+
+            .success-icon i {
+                font-size: 50px;
+                color: white;
+            }
+
+        .order-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #e74c3c;
+            margin: 20px 0;
+        }
+
+        .info-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+            .info-row:last-child {
+                border-bottom: none;
+            }
+
+        .order-items-table {
+            margin: 30px 0;
+        }
+
+            .order-items-table th {
+                background: #e74c3c;
+                color: white;
+                padding: 15px;
+                font-weight: 600;
+            }
+
+            .order-items-table td {
+                padding: 15px;
+                border-bottom: 1px solid #dee2e6;
+            }
+
+        .total-row {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #e74c3c;
+            padding-top: 20px;
+            margin-top: 20px;
+            border-top: 3px solid #e74c3c;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .btn-track {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 15px 35px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+            .btn-track:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(52,152,219,0.3);
+                color: white;
+            }
+
+        .btn-continue {
+            background: white;
+            color: #e74c3c;
+            border: 2px solid #e74c3c;
+            padding: 15px 35px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+            .btn-continue:hover {
+                background: #e74c3c;
+                color: white;
+            }
+
+        @@keyframes scaleIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-processing {
+            background: #cfe2ff;
+            color: #084298;
+        }
+
+        .status-shipped {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+    </style>
+}
+
+<div class="container confirmation-container">
+    <div class="confirmation-card">
+        <!-- Success Icon -->
+        <div class="success-icon">
+            <i class="fas fa-check"></i>
+        </div>
+
+        <!-- Success Message -->
+        <div class="text-center">
+            <h1 class="mb-3">
+                @if (Model.IsCashOnDelivery)
+                {
+                    <text>Order Placed Successfully! </text>
+                }
+                else
+                {
+                    <text>Payment Successful!</text>
+                }
+            </h1>
+            <p class="text-muted mb-2">Thank you for your order, @Model.CustomerName!</p>
+            <p class="order-number">Order #@Model.OrderNumber</p>
+
+            <span class="status-badge status-@Model.Status.ToString().ToLower()">
+                <i class="fas fa-circle me-1" style="font-size:0.6rem;"></i>
+                @Model.Status.ToString()
+            </span>
+        </div>
+
+        <!-- Order Information -->
+        <div class="info-section">
+            <h5 class="mb-3"><i class="fas fa-info-circle me-2 text-primary"></i>Order Details</h5>
+
+            <div class="info-row">
+                <span class="text-muted">Order Date:</span>
+                <strong>@Model.OrderDate.ToString("dddd, dd MMMM yyyy hh:mm tt")</strong>
+            </div>
+
+            <div class="info-row">
+                <span class="text-muted">Delivery Method:</span>
+                <strong>
+                    @if (Model.IsDelivery)
+                    {
+                        <i class="fas fa-truck text-primary me-1"></i>
+                        <text>Home Delivery</text>
+                    }
+                    else
+                    {
+                        <i class="fas fa-store text-success me-1"></i>
+                        <text>Store Pickup</text>
+                    }
+                </strong>
+            </div>
+
+            <div class="info-row">
+                <span class="text-muted">Payment Method:</span>
+                <strong>
+                    @if (Model.IsCashOnDelivery)
+                    {
+                        <i class="fas fa-money-bill-wave text-warning me-1"></i>
+                        <text>Cash on Delivery</text>
+                    }
+                    else
+                    {
+                        <i class="fas fa-credit-card text-info me-1"></i>
+                        <text>Online Payment</text>
+                    }
+                </strong>
+            </div>
+
+            <div class="info-row">
+                <span class="text-muted">Payment Status:</span>
+                <strong class="@(Model.PaymentStatus == "Paid" ? "text-success" : "text-warning")">
+                    @Model.PaymentStatus
+                </strong>
+            </div>
+
+            @if (Model.EstimatedDeliveryDate.HasValue)
+            {
+                <div class="info-row">
+                    <span class="text-muted">Estimated Delivery:</span>
+                    <strong class="text-primary">@Model.EstimatedDeliveryDate.Value.ToString("dd MMM yyyy")</strong>
+                </div>
+            }
+        </div>
+
+        <!-- Delivery/Pickup Address -->
+        <div class="info-section">
+            <h5 class="mb-3">
+                <i class="fas fa-map-marker-alt me-2 text-danger"></i>
+                @(Model.IsDelivery ? "Delivery Address" : "Pickup Location")
+            </h5>
+
+            <p class="mb-2"><strong>@Model.CustomerName</strong></p>
+            <p class="mb-1">@Model.CustomerPhone</p>
+            @if (!string.IsNullOrEmpty(Model.CustomerEmail))
+            {
+                <p class="mb-1">@Model.CustomerEmail</p>
+            }
+            <p class="mb-0 text-muted">@Model.ShippingAddress</p>
+
+            @if (!string.IsNullOrEmpty(Model.DeliveryInstructions))
+            {
+                <div class="alert alert-info mt-3 mb-0">
+                    <small>
+                        <i class="fas fa-sticky-note me-1"></i>
+                        <strong>Instructions:</strong> @Model.DeliveryInstructions
+                    </small>
+                </div>
+            }
+        </div>
+
+        <!-- Order Items -->
+        <div class="order-items-table">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th class="text-center">Quantity</th>
+                        <th class="text-end">Unit Price</th>
+                        <th class="text-end">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.OrderItems)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@item.ProductName</strong>
+                                @if (!string.IsNullOrEmpty(item.SKU))
+                                {
+                                    <br>
+                            
+                                    <small class="text-muted">SKU: @item.SKU</small>
+                                }
+                            </td>
+                            <td class="text-center">@item.Quantity</td>
+                            <td class="text-end">$@item.UnitPrice.ToString("N2")</td>
+                            <td class="text-end fw-bold">$@item.TotalPrice.ToString("N2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <!-- Order Summary -->
+            <div class="text-end">
+                <div class="mb-2">
+                    <span class="me-4">Subtotal:</span>
+                    <strong>$@Model.SubTotal.ToString("N2")</strong>
+                </div>
+                <div class="mb-2">
+                    <span class="me-4">Tax (13% VAT):</span>
+                    <strong>$@Model.TaxAmount.ToString("N2")</strong>
+                </div>
+                <div class="mb-2">
+                    <span class="me-4">
+                        @(Model.IsDelivery ? "Delivery Charge:" : "Service Fee:")
+                    </span>
+                    <strong>
+                        @if (Model.ShippingCost == 0)
+                        {
+                            <span class="text-success">FREE</span>
+                        }
+                        else
+                        {
+                            <text>$@Model.ShippingCost.ToString("N2")</text>
+                        }
+                    </strong>
+                </div>
+                <div class="total-row">
+                    <span class="me-4">Total:</span>
+                    <span>$@Model.TotalAmount.ToString("N2")</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- COD Payment Notice -->
+        @if (Model.IsCashOnDelivery)
+        {
+            <div class="alert alert-warning">
+                <h6><i class="fas fa-exclamation-triangle me-2"></i>Cash on Delivery Payment</h6>
+                <p class="mb-0">
+                    Please keep <strong>$@Model.TotalAmount.ToString("N2")</strong> ready for the delivery driver.
+                    Payment must be made in cash upon delivery.
+                </p>
+            </div>
+        }
+
+        <!-- Email Confirmation Notice -->
+        <div class="alert alert-info">
+            <i class="fas fa-envelope me-2"></i>
+            A confirmation email has been sent to <strong>@Model.CustomerEmail</strong>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            @if (Model.IsDelivery)
+            {
+                <a href="#" class="btn-track">
+                    <i class="fas fa-map-marker-alt me-2"></i>Track Order
+                </a>
+            }
+            <a asp-controller="Home" asp-action="Index" class="btn-continue">
+                <i class="fas fa-shopping-bag me-2"></i>Continue Shopping
+            </a>
+        </div>
+
+        <!-- Support Contact -->
+        <div class="text-center mt-5 pt-4 border-top">
+            <p class="text-muted mb-2">
+                <small>Need help with your order?</small>
+            </p>
+            <p class="mb-0">
+                <i class="fas fa-phone text-success me-2"></i>
+                <strong>1300 XXX XXX</strong>
+                <span class="mx-3">|</span>
+                <i class="fas fa-envelope text-primary me-2"></i>
+                <strong>support@hamrogrocery.com.au</strong>
+            </p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Print order confirmation
+        function printOrder() {
+            window.print();
+        }
+
+        // Confetti animation on load (optional enhancement)
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add celebration effect if needed
+            console.log('Order confirmed:', '@Model.OrderNumber');
+        });
+    </script>
+}

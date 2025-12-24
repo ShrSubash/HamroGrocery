@@ -1,0 +1,747 @@
+Folder PATH listing for volume Seagate Expansion Drive
+Volume serial number is E6E4-6E10
+G:.
+¦   appsettings.Development.json
+¦   appsettings.json
+¦   HamroGrocery.csproj
+¦   HamroGrocery.csproj.user
+¦   HamroGrocery.sln
+¦   New Text Document.txt
+¦   Program.cs
+¦   ScaffoldingReadMe.txt
+¦   structure.txt
+¦   
+¦   ¦   ProjectSettings.json
+¦   ¦   slnx.sqlite
+¦   ¦   VSWorkspaceState.json
+¦   ¦   
+¦   +---HamroGrocery
+¦   ¦   +---config
+¦   ¦   ¦       applicationhost.config
+¦   ¦   ¦       
+¦   ¦   +---CopilotIndices
+¦   ¦   ¦   +---17.14.1204.46620
+¦   ¦   ¦   ¦       CodeChunks.db
+¦   ¦   ¦   ¦       SemanticSymbols.db
+¦   ¦   ¦   ¦       
+¦   ¦   ¦   +---17.14.1518.61961
+¦   ¦   ¦           CodeChunks.db
+¦   ¦   ¦           SemanticSymbols.db
+¦   ¦   ¦           
+¦   ¦   +---DesignTimeBuild
+¦   ¦   ¦       .dtbcache.v2
+¦   ¦   ¦       
+¦   ¦   +---FileContentIndex
+¦   ¦   ¦       
+¦   ¦   +---v17
+¦   ¦           .futdcache.v2
+¦   ¦           DocumentLayout.backup.json
+¦   ¦           DocumentLayout.json
+¦   ¦           HierarchyCache.v1.txt
+¦   ¦           
+¦   +---ProjectEvaluation
+¦           
+¦   +---Admin
+¦   ¦   +---Controllers
+¦   ¦   ¦       AnnouncementsController.cs
+¦   ¦   ¦       CategoriesController.cs
+¦   ¦   ¦       HomeController.cs
+¦   ¦   ¦       InventoryController.cs
+¦   ¦   ¦       OrdersController.cs
+¦   ¦   ¦       ProductsController.cs
+¦   ¦   ¦       ProductSpecialsController.cs
+¦   ¦   ¦       ProductVariationsController.cs
+¦   ¦   ¦       PurchaseOrdersController.cs
+¦   ¦   ¦       ReportsController.cs
+¦   ¦   ¦       SuppliersController.cs
+¦   ¦   ¦       UsersController.cs
+¦   ¦   ¦       
+¦   ¦   +---Models
+¦   ¦   +---ViewModels
+¦   ¦   ¦       CreateProductViewModel.cs
+¦   ¦   ¦       DashboardViewModel.cs
+¦   ¦   ¦       InventoryStatsViewModel.cs
+¦   ¦   ¦       
+¦   ¦   +---Views
+¦   ¦       ¦   _ViewImports.cshtml
+¦   ¦       ¦   _ViewStart.cshtml
+¦   ¦       ¦   
+¦   ¦       +---Announcements
+¦   ¦       ¦       Create.cshtml
+¦   ¦       ¦       Edit.cshtml
+¦   ¦       ¦       Index.cshtml
+¦   ¦       ¦       
+¦   ¦       +---Categories
+¦   ¦       ¦       Create.cshtml
+¦   ¦       ¦       Index.cshtml
+¦   ¦       ¦       
+¦   ¦       +---Home
+¦   ¦       ¦       Index.cshtml
+¦   ¦       ¦       
+¦   ¦       +---Inventory
+¦   ¦       ¦       Index.cshtml
+¦   ¦       ¦       
+¦   ¦       +---Orders
+¦   ¦       ¦       Details.cshtml
+¦   ¦       ¦       Edit.cshtml
+¦   ¦       ¦       Index.cshtml
+¦   ¦       ¦       
+¦   ¦       +---Products
+¦   ¦       ¦       Create.cshtml
+¦   ¦       ¦       Details.cshtml
+¦   ¦       ¦       Edit.cshtml
+¦   ¦       ¦       Index.cshtml
+¦   ¦       ¦       _LiveSearchResults.cshtml
+¦   ¦       ¦       
+¦   ¦       +---ProductSpecials
+¦   ¦       ¦       Create.cshtml
+¦   ¦       ¦       Details.cshtml
+¦   ¦       ¦       Edit.cshtml
+¦   ¦       ¦       Index.cshtml
+¦   ¦       ¦       
+¦   ¦       +---ProductVariations
+¦   ¦       ¦       Index.cshtml
+¦   ¦       ¦       
+¦   ¦       +---PurchaseOrders
+¦   ¦       ¦       Create.cshtml
+¦   ¦       ¦       CreateProduct.cshtml
+¦   ¦       ¦       Details.cshtml
+¦   ¦       ¦       Edit.cshtml
+¦   ¦       ¦       Index.cshtml
+¦   ¦       ¦       
+¦   ¦       +---Reports
+¦   ¦       ¦       Index.cshtml
+¦   ¦       ¦       
+¦   ¦       +---Shared
+¦   ¦       ¦       _Layout.cshtml
+¦   ¦       ¦       
+¦   ¦       +---Suppliers
+¦   ¦       ¦       Index.cshtml
+¦   ¦       ¦       
+¦   ¦       +---Users
+¦   ¦               Index.cshtml
+¦   ¦               
+¦   +---Identity
+¦       +---Pages
+¦           ¦   _ValidationScriptsPartial.cshtml
+¦           ¦   _ViewImports.cshtml
+¦           ¦   _ViewStart.cshtml
+¦           ¦   
+¦           +---Account
+¦               ¦   ForgotPassword.cshtml
+¦               ¦   ForgotPassword.cshtml.cs
+¦               ¦   Login.cshtml
+¦               ¦   Login.cshtml.cs
+¦               ¦   LoginWith2fa.cshtml
+¦               ¦   LoginWith2fa.cshtml.cs
+¦               ¦   Logout.cshtml
+¦               ¦   Logout.cshtml.cs
+¦               ¦   Register.cshtml
+¦               ¦   Register.cshtml.cs
+¦               ¦   _ViewImports.cshtml
+¦               ¦   
+¦               +---Manage
+¦                       Index.cshtml
+¦                       Index.cshtml.cs
+¦                       ManageNavPages.cs
+¦                       _ManageNav.cshtml
+¦                       _ViewImports.cshtml
+¦                       
+¦       +---net10.0
+¦       +---net9.0
+¦           ¦   appsettings.Development.json
+¦           ¦   appsettings.json
+¦           ¦   Azure.Core.dll
+¦           ¦   Azure.Identity.dll
+¦           ¦   BCrypt.Net-Next.dll
+¦           ¦   DocumentFormat.OpenXml.dll
+¦           ¦   DocumentFormat.OpenXml.Framework.dll
+¦           ¦   dotnet-aspnet-codegenerator-design.dll
+¦           ¦   HamroGrocery.deps.json
+¦           ¦   HamroGrocery.dll
+¦           ¦   HamroGrocery.exe
+¦           ¦   HamroGrocery.pdb
+¦           ¦   HamroGrocery.runtimeconfig.json
+¦           ¦   HamroGrocery.staticwebassets.endpoints.json
+¦           ¦   HamroGrocery.staticwebassets.runtime.json
+¦           ¦   Humanizer.dll
+¦           ¦   Microsoft.AspNetCore.Cryptography.Internal.dll
+¦           ¦   Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
+¦           ¦   Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+¦           ¦   Microsoft.AspNetCore.Identity.UI.dll
+¦           ¦   Microsoft.AspNetCore.Razor.Language.dll
+¦           ¦   Microsoft.Bcl.AsyncInterfaces.dll
+¦           ¦   Microsoft.Build.dll
+¦           ¦   Microsoft.Build.Framework.dll
+¦           ¦   Microsoft.Build.Locator.dll
+¦           ¦   Microsoft.CodeAnalysis.AnalyzerUtilities.dll
+¦           ¦   Microsoft.CodeAnalysis.CSharp.dll
+¦           ¦   Microsoft.CodeAnalysis.CSharp.Features.dll
+¦           ¦   Microsoft.CodeAnalysis.CSharp.Workspaces.dll
+¦           ¦   Microsoft.CodeAnalysis.dll
+¦           ¦   Microsoft.CodeAnalysis.Elfie.dll
+¦           ¦   Microsoft.CodeAnalysis.Features.dll
+¦           ¦   Microsoft.CodeAnalysis.Razor.dll
+¦           ¦   Microsoft.CodeAnalysis.Scripting.dll
+¦           ¦   Microsoft.CodeAnalysis.Workspaces.dll
+¦           ¦   Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.dll
+¦           ¦   Microsoft.CodeAnalysis.Workspaces.MSBuild.dll
+¦           ¦   Microsoft.Data.SqlClient.dll
+¦           ¦   Microsoft.Data.Sqlite.dll
+¦           ¦   Microsoft.DiaSymReader.dll
+¦           ¦   Microsoft.DotNet.Scaffolding.Shared.dll
+¦           ¦   Microsoft.EntityFrameworkCore.Abstractions.dll
+¦           ¦   Microsoft.EntityFrameworkCore.Design.dll
+¦           ¦   Microsoft.EntityFrameworkCore.dll
+¦           ¦   Microsoft.EntityFrameworkCore.Relational.dll
+¦           ¦   Microsoft.EntityFrameworkCore.Sqlite.dll
+¦           ¦   Microsoft.EntityFrameworkCore.SqlServer.dll
+¦           ¦   Microsoft.Extensions.Caching.Abstractions.dll
+¦           ¦   Microsoft.Extensions.Caching.Memory.dll
+¦           ¦   Microsoft.Extensions.Configuration.Abstractions.dll
+¦           ¦   Microsoft.Extensions.DependencyInjection.Abstractions.dll
+¦           ¦   Microsoft.Extensions.DependencyInjection.dll
+¦           ¦   Microsoft.Extensions.DependencyModel.dll
+¦           ¦   Microsoft.Extensions.FileProviders.Abstractions.dll
+¦           ¦   Microsoft.Extensions.FileProviders.Embedded.dll
+¦           ¦   Microsoft.Extensions.Identity.Core.dll
+¦           ¦   Microsoft.Extensions.Identity.Stores.dll
+¦           ¦   Microsoft.Extensions.Logging.Abstractions.dll
+¦           ¦   Microsoft.Extensions.Logging.dll
+¦           ¦   Microsoft.Extensions.Options.dll
+¦           ¦   Microsoft.Extensions.Primitives.dll
+¦           ¦   Microsoft.Identity.Client.dll
+¦           ¦   Microsoft.Identity.Client.Extensions.Msal.dll
+¦           ¦   Microsoft.IdentityModel.Abstractions.dll
+¦           ¦   Microsoft.IdentityModel.JsonWebTokens.dll
+¦           ¦   Microsoft.IdentityModel.Logging.dll
+¦           ¦   Microsoft.IdentityModel.Protocols.dll
+¦           ¦   Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+¦           ¦   Microsoft.IdentityModel.Tokens.dll
+¦           ¦   Microsoft.NET.StringTools.dll
+¦           ¦   Microsoft.SqlServer.Server.dll
+¦           ¦   Microsoft.VisualStudio.Web.CodeGeneration.Core.dll
+¦           ¦   Microsoft.VisualStudio.Web.CodeGeneration.dll
+¦           ¦   Microsoft.VisualStudio.Web.CodeGeneration.EntityFrameworkCore.dll
+¦           ¦   Microsoft.VisualStudio.Web.CodeGeneration.Templating.dll
+¦           ¦   Microsoft.VisualStudio.Web.CodeGeneration.Utils.dll
+¦           ¦   Microsoft.VisualStudio.Web.CodeGenerators.Mvc.dll
+¦           ¦   Mono.TextTemplating.dll
+¦           ¦   MySqlConnector.dll
+¦           ¦   Newtonsoft.Json.dll
+¦           ¦   NuGet.Common.dll
+¦           ¦   NuGet.Configuration.dll
+¦           ¦   NuGet.DependencyResolver.Core.dll
+¦           ¦   NuGet.Frameworks.dll
+¦           ¦   NuGet.LibraryModel.dll
+¦           ¦   NuGet.Packaging.dll
+¦           ¦   NuGet.ProjectModel.dll
+¦           ¦   NuGet.Protocol.dll
+¦           ¦   NuGet.Versioning.dll
+¦           ¦   Pomelo.EntityFrameworkCore.MySql.dll
+¦           ¦   Serilog.AspNetCore.dll
+¦           ¦   Serilog.dll
+¦           ¦   Serilog.Extensions.Hosting.dll
+¦           ¦   Serilog.Extensions.Logging.dll
+¦           ¦   Serilog.Formatting.Compact.dll
+¦           ¦   Serilog.Settings.Configuration.dll
+¦           ¦   Serilog.Sinks.Console.dll
+¦           ¦   Serilog.Sinks.File.dll
+¦           ¦   SQLitePCLRaw.batteries_v2.dll
+¦           ¦   SQLitePCLRaw.core.dll
+¦           ¦   SQLitePCLRaw.provider.e_sqlite3.dll
+¦           ¦   Stripe.net.dll
+¦           ¦   System.ClientModel.dll
+¦           ¦   System.CodeDom.dll
+¦           ¦   System.Composition.AttributedModel.dll
+¦           ¦   System.Composition.Convention.dll
+¦           ¦   System.Composition.Hosting.dll
+¦           ¦   System.Composition.Runtime.dll
+¦           ¦   System.Composition.TypedParts.dll
+¦           ¦   System.Configuration.ConfigurationManager.dll
+¦           ¦   System.IdentityModel.Tokens.Jwt.dll
+¦           ¦   System.IO.Packaging.dll
+¦           ¦   System.Linq.Dynamic.Core.dll
+¦           ¦   System.Memory.Data.dll
+¦           ¦   System.Reflection.MetadataLoadContext.dll
+¦           ¦   System.Runtime.Caching.dll
+¦           ¦   System.Security.Cryptography.ProtectedData.dll
+¦           ¦   
+¦           +---af
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---ar
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---az
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---bg
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---bn-BD
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---cs
+¦           ¦       Humanizer.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.Features.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Features.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Scripting.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Workspaces.resources.dll
+¦           ¦       
+¦           +---da
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---de
+¦           ¦       Humanizer.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.Features.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Features.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Scripting.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Workspaces.resources.dll
+¦           ¦       
+¦           +---el
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---es
+¦           ¦       Humanizer.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.Features.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Features.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Scripting.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Workspaces.resources.dll
+¦           ¦       
+¦           +---fa
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---fi-FI
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---fr
+¦           ¦       Humanizer.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.Features.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Features.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Scripting.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Workspaces.resources.dll
+¦           ¦       
+¦           +---fr-BE
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---he
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---hr
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---hu
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---hy
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---id
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---is
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---it
+¦           ¦       Humanizer.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.Features.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Features.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Scripting.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Workspaces.resources.dll
+¦           ¦       
+¦           +---ja
+¦           ¦       Humanizer.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.Features.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Features.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Scripting.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Workspaces.resources.dll
+¦           ¦       
+¦           +---ko
+¦           ¦       Microsoft.CodeAnalysis.CSharp.Features.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Features.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Scripting.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Workspaces.resources.dll
+¦           ¦       
+¦           +---ko-KR
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---ku
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---lv
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---ms-MY
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---mt
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---nb
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---nb-NO
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---nl
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---pl
+¦           ¦       Humanizer.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.Features.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Features.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Scripting.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Workspaces.resources.dll
+¦           ¦       
+¦           +---pt
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---pt-BR
+¦           ¦       Microsoft.CodeAnalysis.CSharp.Features.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Features.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Scripting.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Workspaces.resources.dll
+¦           ¦       
+¦           +---ro
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---ru
+¦           ¦       Humanizer.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.Features.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Features.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Scripting.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Workspaces.resources.dll
+¦           ¦       
+¦           +---runtimes
+¦           ¦   +---browser-wasm
+¦           ¦   ¦   +---nativeassets
+¦           ¦   ¦       +---net9.0
+¦           ¦   ¦               e_sqlite3.a
+¦           ¦   ¦               
+¦           ¦   +---linux-arm
+¦           ¦   ¦   +---native
+¦           ¦   ¦           libe_sqlite3.so
+¦           ¦   ¦           
+¦           ¦   +---linux-arm64
+¦           ¦   ¦   +---native
+¦           ¦   ¦           libe_sqlite3.so
+¦           ¦   ¦           
+¦           ¦   +---linux-armel
+¦           ¦   ¦   +---native
+¦           ¦   ¦           libe_sqlite3.so
+¦           ¦   ¦           
+¦           ¦   +---linux-mips64
+¦           ¦   ¦   +---native
+¦           ¦   ¦           libe_sqlite3.so
+¦           ¦   ¦           
+¦           ¦   +---linux-musl-arm
+¦           ¦   ¦   +---native
+¦           ¦   ¦           libe_sqlite3.so
+¦           ¦   ¦           
+¦           ¦   +---linux-musl-arm64
+¦           ¦   ¦   +---native
+¦           ¦   ¦           libe_sqlite3.so
+¦           ¦   ¦           
+¦           ¦   +---linux-musl-s390x
+¦           ¦   ¦   +---native
+¦           ¦   ¦           libe_sqlite3.so
+¦           ¦   ¦           
+¦           ¦   +---linux-musl-x64
+¦           ¦   ¦   +---native
+¦           ¦   ¦           libe_sqlite3.so
+¦           ¦   ¦           
+¦           ¦   +---linux-ppc64le
+¦           ¦   ¦   +---native
+¦           ¦   ¦           libe_sqlite3.so
+¦           ¦   ¦           
+¦           ¦   +---linux-s390x
+¦           ¦   ¦   +---native
+¦           ¦   ¦           libe_sqlite3.so
+¦           ¦   ¦           
+¦           ¦   +---linux-x64
+¦           ¦   ¦   +---native
+¦           ¦   ¦           libe_sqlite3.so
+¦           ¦   ¦           
+¦           ¦   +---linux-x86
+¦           ¦   ¦   +---native
+¦           ¦   ¦           libe_sqlite3.so
+¦           ¦   ¦           
+¦           ¦   +---maccatalyst-arm64
+¦           ¦   ¦   +---native
+¦           ¦   ¦           libe_sqlite3.dylib
+¦           ¦   ¦           
+¦           ¦   +---maccatalyst-x64
+¦           ¦   ¦   +---native
+¦           ¦   ¦           libe_sqlite3.dylib
+¦           ¦   ¦           
+¦           ¦   +---osx-arm64
+¦           ¦   ¦   +---native
+¦           ¦   ¦           libe_sqlite3.dylib
+¦           ¦   ¦           
+¦           ¦   +---osx-x64
+¦           ¦   ¦   +---native
+¦           ¦   ¦           libe_sqlite3.dylib
+¦           ¦   ¦           
+¦           ¦   +---unix
+¦           ¦   ¦   +---lib
+¦           ¦   ¦       +---net6.0
+¦           ¦   ¦               Microsoft.Data.SqlClient.dll
+¦           ¦   ¦               
+¦           ¦   +---win
+¦           ¦   ¦   +---lib
+¦           ¦   ¦       +---net6.0
+¦           ¦   ¦               Microsoft.Data.SqlClient.dll
+¦           ¦   ¦               System.Runtime.Caching.dll
+¦           ¦   ¦               
+¦           ¦   +---win-arm
+¦           ¦   ¦   +---native
+¦           ¦   ¦           e_sqlite3.dll
+¦           ¦   ¦           Microsoft.Data.SqlClient.SNI.dll
+¦           ¦   ¦           
+¦           ¦   +---win-arm64
+¦           ¦   ¦   +---native
+¦           ¦   ¦           e_sqlite3.dll
+¦           ¦   ¦           Microsoft.Data.SqlClient.SNI.dll
+¦           ¦   ¦           
+¦           ¦   +---win-x64
+¦           ¦   ¦   +---native
+¦           ¦   ¦           e_sqlite3.dll
+¦           ¦   ¦           Microsoft.Data.SqlClient.SNI.dll
+¦           ¦   ¦           
+¦           ¦   +---win-x86
+¦           ¦       +---native
+¦           ¦               e_sqlite3.dll
+¦           ¦               Microsoft.Data.SqlClient.SNI.dll
+¦           ¦               
+¦           +---sk
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---sl
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---sr
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---sr-Latn
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---sv
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---th-TH
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---tr
+¦           ¦       Humanizer.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.Features.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Features.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Scripting.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Workspaces.resources.dll
+¦           ¦       
+¦           +---uk
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---uz-Cyrl-UZ
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---uz-Latn-UZ
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---vi
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---zh-CN
+¦           ¦       Humanizer.resources.dll
+¦           ¦       
+¦           +---zh-Hans
+¦           ¦       Humanizer.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.Features.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Features.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Scripting.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+¦           ¦       Microsoft.CodeAnalysis.Workspaces.resources.dll
+¦           ¦       
+¦           +---zh-Hant
+¦                   Humanizer.resources.dll
+¦                   Microsoft.CodeAnalysis.CSharp.Features.resources.dll
+¦                   Microsoft.CodeAnalysis.CSharp.resources.dll
+¦                   Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+¦                   Microsoft.CodeAnalysis.Features.resources.dll
+¦                   Microsoft.CodeAnalysis.resources.dll
+¦                   Microsoft.CodeAnalysis.Scripting.resources.dll
+¦                   Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+¦                   Microsoft.CodeAnalysis.Workspaces.resources.dll
+¦                   
+¦       CartController.cs
+¦       CheckoutController.cs
+¦       HomeController.cs
+¦       OrdersController.cs
+¦       ProductsController.cs
+¦       StripeWebhookController.cs
+¦       
+¦       ApplicationDbContext.cs
+¦       ApplicationDbContextFactory.cs
+¦       ApplicationDbContextSeed.cs
+¦       
+¦       ClaimsPrincipalExtensions.cs
+¦       
+¦       20250923103454_InitialCreateFixed.cs
+¦       20251107024236_UpdatePurchaseOrderEntities.cs
+¦       20251107033317_AddAnnouncementEntity.cs
+¦       20251201214615_AddCheckoutFields.cs
+¦       20251202000955_AddTrackingNumberToOrder.cs
+¦       ApplicationDbContextModelSnapshot.cs
+¦       
+¦   ¦   Cart.cs
+¦   ¦   ErrorViewModel.cs
+¦   ¦   OrderPaymentResult.cs
+¦   ¦   PaymentIntentRequest.cs
+¦   ¦   
+¦   +---DTOs
+¦   +---Entities
+¦   ¦       Announcement.cs
+¦   ¦       BaseEntity.cs
+¦   ¦       Category.cs
+¦   ¦       City.cs
+¦   ¦       Country.cs
+¦   ¦       DiscountType.cs
+¦   ¦       Order.cs
+¦   ¦       OrderItem.cs
+¦   ¦       Product.cs
+¦   ¦       ProductSpecial.cs
+¦   ¦       ProductVariation.cs
+¦   ¦       PurchaseOrder.cs
+¦   ¦       PurchaseOrderItem.cs
+¦   ¦       PurchaseOrderStatus.cs
+¦   ¦       Shipment.cs
+¦   ¦       ShippingProvider.cs
+¦   ¦       SpecialUploadResult.cs
+¦   ¦       StateProvince.cs
+¦   ¦       StockMovement.cs
+¦   ¦       Supplier.cs
+¦   ¦       TrackingEvent.cs
+¦   ¦       User.cs
+¦   ¦       
+¦   +---RequestModels
+¦   ¦       CreatePurchaseOrderRequest.cs
+¦   ¦       ReceivedItemModel.cs
+¦   ¦       ReceivePurchaseOrderRequest.cs
+¦   ¦       StockUpdateModel.cs
+¦   ¦       
+¦   +---ViewModels
+¦           BulkUploadSpecialsViewModel.cs
+¦           CheckoutViewModel.cs
+¦           CreateProductDetailedViewModel.cs
+¦           CreateProductViewModel.cs
+¦           CreatePurchaseOrderViewModel.cs
+¦           DashboardViewModel.cs
+¦           HomePageViewModel.cs
+¦           ProductDetailsViewModel.cs
+¦           ProductIndexViewModel.cs
+¦           ProductSpecialsIndexViewModel.cs
+¦           ProductSpecialViewModel.cs
+¦           PurchaseOrderIndexViewModel.cs
+¦           PurchaseOrderItemViewModel.cs
+¦           
+¦  
+¦       launchSettings.json
+¦       
+¦   ¦   CartService.cs
+¦   ¦   InventoryService.cs
+¦   ¦   IPaymentService.cs
+¦   ¦   PaymentFactory.cs
+¦   ¦   ReportingService.cs
+¦   ¦   SessionCartRepository.cs
+¦   ¦   ShippingService.cs
+¦   ¦   StripePaymentService.cs
+¦   ¦   
+¦   +---Interfaces
+¦   ¦       ICartRepository.cs
+¦   ¦       ICartService.cs
+¦   ¦       IInventoryService.cs
+¦   ¦       IReportingService.cs
+¦   ¦       IShippingProvider.cs
+¦   ¦       IShippingService.cs
+¦   ¦       
+¦   +---Providers
+¦           FedExProvider.cs
+¦           
+¦   ¦   _ViewImports.cshtml
+¦   ¦   _ViewStart.cshtml
+¦   ¦   
+¦   +---Cart
+¦   ¦       Index.cshtml
+¦   ¦       
+¦   +---Checkout
+¦   ¦       Index.cshtml
+¦   ¦       OrderConfirmation.cshtml
+¦   ¦       
+¦   +---Home
+¦   ¦       Index.cshtml
+¦   ¦       Privacy.cshtml
+¦   ¦       
+¦   +---Orders
+¦   ¦       Details.cshtml
+¦   ¦       MyOrders.cshtml
+¦   ¦       
+¦   +---Products
+¦   ¦       Details.cshtml
+¦   ¦       Details.cshtml.cs
+¦   ¦       Index.cshtml
+¦   ¦       
+¦   +---Shared
+¦           Error.cshtml
+¦           _AnnouncementBar.cshtml
+¦           _Layout.cshtml
+¦           _Layout.cshtml.css
+¦           _ValidationScriptsPartial.cshtml
+¦           
+  

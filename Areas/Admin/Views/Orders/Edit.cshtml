@@ -1,0 +1,57 @@
+﻿@model HamroGrocery.Models.Entities.Order
+@{
+    ViewData["Title"] = "Update Order Status";
+}
+
+<div class="container-fluid py-4">
+    <h2 class="mb-4">Update Order #@Model.Id</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    <div class="card shadow">
+        <div class="card-body">
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Current Status</label>
+                            <div class="p-3 bg-light rounded">
+                                <span class="badge bg-@(Model.Status == OrderStatus.Delivered ? "success" :
+                                                                                            Model.Status == OrderStatus.Pending ? "warning" :
+                                                                                            Model.Status == OrderStatus.Processing ? "info" : "secondary") fs-6">
+                                    @Model.Status
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Status" class="form-label fw-bold"></label>
+                            <select asp-for="Status" class="form-select form-select-lg" asp-items="ViewBag.StatusList"></select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tracking Number (Optional)</label>
+                            <input type="text" name="TrackingNumber" class="form-control" value="@Model.TrackingNumber" placeholder="e.g. NP123456789" />
+                            <small class="text-muted">Only fill when shipped</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-success btn-lg px-4">
+                        Save Changes
+                    </button>
+                    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary btn-lg px-4">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

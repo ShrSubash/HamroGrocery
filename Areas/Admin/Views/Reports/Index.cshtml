@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Reports";
+}
+<div class="report-actions d-flex flex-wrap gap-3">
+    <a asp-area="Admin" asp-controller="Reports" asp-action="Daily" class="btn btn-outline-primary">
+        <i class="fas fa-calendar-day"></i> End of Day
+    </a>
+    <a asp-area="Admin" asp-controller="Reports" asp-action="Weekly" class="btn btn-outline-primary">
+        <i class="fas fa-calendar-week"></i> Weekly Report
+    </a>
+    <a asp-area="Admin" asp-controller="Reports" asp-action="Monthly" class="btn btn-outline-primary">
+        <i class="fas fa-calendar-alt"></i> Monthly Report
+    </a>
+    <a asp-area="Admin" asp-controller="Reports" asp-action="Yearly" class="btn btn-outline-primary">
+        <i class="fas fa-calendar"></i> Yearly Report
+    </a>
+    <a asp-area="Admin" asp-controller="Reports" asp-action="Inventory" class="btn btn-outline-secondary">
+        <i class="fas fa-boxes"></i> Inventory Report
+    </a>
+    <a asp-area="Admin" asp-controller="Reports" asp-action="Sales" class="btn btn-outline-success">
+        <i class="fas fa-chart-line"></i> Sales Report
+    </a>
+</div>

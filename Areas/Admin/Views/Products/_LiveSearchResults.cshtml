@@ -1,0 +1,41 @@
+﻿@* Views/Products/_LiveSearchResults.cshtml *@
+@model IEnumerable<dynamic>
+
+@if (!Model.Any())
+{
+    <div class="p-4 text-center text-muted">
+        <small>No products found</small>
+    </div>
+}
+else
+{
+    <div class="list-group list-group-flush">
+        @foreach (var product in Model)
+        {
+            <a asp-controller="Products"
+               asp-action="Details"
+               asp-route-id="@product.Id"
+               class="list-group-item list-group-item-action d-flex align-items-center gap-3 p-3 border-0 border-bottom">
+
+                <img src="@(product.ImagePath ?? "/images/no-image.jpg")"
+                     alt="@product.ProductName"
+                     class="rounded"
+                     style="width: 50px; height: 50px; object-fit: cover;">
+
+                <div class="flex-grow-1">
+                    <h6 class="mb-1 fw-semibold">@product.ProductName</h6>
+                    <small class="text-danger fw-bold">NPR @product.Price.ToString("N0")</small>
+                </div>
+
+                <i class="fas fa-arrow-right text-muted"></i>
+            </a>
+        }
+
+        <a asp-controller="Products"
+           asp-action="Index"
+           asp-route-search="@ViewBag.Query"
+           class="list-group-item text-center py-3 text-danger fw-bold small">
+            View all results →
+        </a>
+    </div>
+}

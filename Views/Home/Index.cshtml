@@ -1,0 +1,343 @@
+﻿@model HamroGrocery.Models.ViewModels.HomePageViewModel
+
+@{
+    ViewData["Title"] = "Hamro Grocery - Fresh Indian Groceries in Sydney, NSW";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+}
+
+<!-- Announcement Bar (Fixed) -->
+@if (Model.Announcements != null && Model.Announcements.Any())
+{
+    <section class="announcement-bar">
+        <div class="container">
+            @foreach (var announcement in Model.Announcements.Take(1))
+            {
+                <div class="announcement-content">
+                    <i class="fas fa-@(announcement.Type == HamroGrocery.Models.Entities.AnnouncementType.Info ? "info-circle" :
+                                                                      announcement.Type == HamroGrocery.Models.Entities.AnnouncementType.Warning ? "exclamation-triangle" :
+                                                                      announcement.Type == HamroGrocery.Models.Entities.AnnouncementType.Success ? "check-circle" : "times-circle")"></i>
+            <span><strong>@announcement.Title:</strong> @announcement.Message</span>
+            <button class="announcement-close" onclick="this.closest('.announcement-bar').remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+                }
+        </div>
+    </section>
+}
+
+<!-- Compact Hero -->
+<section class="hero-compact">
+    <div class="container">
+        <div class="hero-wrapper">
+            <div class="hero-content">
+                <h1 class="hero-title">Fresh Indian Groceries Delivered</h1>
+                <p class="hero-subtitle">
+                    5000+ authentic products • Same-day delivery across Sydney, NSW
+                </p>
+
+                <!-- Search Bar -->
+                <form class="hero-search" asp-controller="Products" asp-action="Search">
+                    <input type="text"
+                           name="query"
+                           placeholder="Search for rice, spices, dal, vegetables..."
+                           autocomplete="off">
+                    <button type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+
+                <!-- Trust Badges -->
+                <div class="trust-badges">
+                    <div class="trust-badge">
+                        <i class="fas fa-truck-fast"></i>
+                        <span>Same-Day Delivery</span>
+                    </div>
+                    <div class="trust-badge">
+                        <i class="fas fa-shield-check"></i>
+                        <span>100% Authentic</span>
+                    </div>
+                    <div class="trust-badge">
+                        <i class="fas fa-star"></i>
+                        <span>@Model.Statistics.TotalCustomers+ Happy Customers</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Category Quick Nav (Dynamic from Database) -->
+<nav class="category-nav">
+    <div class="container">
+        <div class="category-scroll">
+            <!-- All Products Link (Always First) -->
+            <a href="@Url.Action("Index", "Products")" class="category-pill active">
+                <i class="fas fa-th"></i> All Products
+            </a>
+
+            <!-- Dynamic Categories from Database -->
+            @if (Model.Categories != null && Model.Categories.Any())
+            {
+                @foreach (var category in Model.Categories)
+                {
+                    <a href="@Url.Action("Index", "Products", new { category = category.CategoryName })"
+                       class="category-pill"
+                       title="@category.Description">
+                        @GetCategoryIcon(category.CategoryName) @category.CategoryName
+                    </a>
+                }
+            }
+            else
+            {
+                <!-- Fallback if no categories exist -->
+                <span class="text-muted ms-3">No categories available</span>
+            }
+        </div>
+    </div>
+</nav>
+
+<!-- Products Grid -->
+<section class="products-section">
+    <div class="container">
+        <!-- Section Header -->
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">Today's Best Sellers</h2>
+                <p class="section-subtitle">Handpicked favorites from Sydney's Indian community</p>
+            </div>
+            <a href="@Url.Action("Index", "Products")" class="view-all-btn">
+                View All <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+
+        @if (Model.FeaturedProducts == null || !Model.FeaturedProducts.Any())
+        {
+            <!-- Loading Skeletons -->
+            <div class="products-grid">
+                @for (int i = 0; i < 8; i++)
+                {
+                    <div class="product-skeleton"></div>
+                }
+            </div>
+        }
+        else
+        {
+            <!-- Products Grid -->
+            <div class="products-grid">
+                @foreach (var product in Model.FeaturedProducts)
+                {
+                    var activeSpecial = product.ProductSpecials?.FirstOrDefault();
+                    var discountedPrice = product.Price;
+                    var savingsPercent = 0m;
+
+                    if (activeSpecial != null)
+                    {
+                        if (activeSpecial.DiscountType == HamroGrocery.Models.Entities.DiscountType.Percentage)
+                        {
+                            discountedPrice = product.Price * (1 - activeSpecial.DiscountValue / 100);
+                            savingsPercent = activeSpecial.DiscountValue;
+                        }
+                        else if (activeSpecial.DiscountType == HamroGrocery.Models.Entities.DiscountType.FixedAmount)
+                        {
+                            discountedPrice = product.Price - activeSpecial.DiscountValue;
+                            savingsPercent = (activeSpecial.DiscountValue / product.Price) * 100;
+                        }
+                    }
+
+                    <div class="product-card">
+                        <!-- Image -->
+                        <div class="product-image-wrapper">
+                            <a href="@Url.Action("Details", "Products", new { id = product.Id })">
+                                <img src="@(product.ImagePath ?? "/images/no-image.jpg")"
+                                     alt="@product.ProductName"
+                                     class="product-image"
+                                     onerror="this.src='/images/no-image.jpg'">
+                            </a>
+
+                            @if (activeSpecial != null)
+                            {
+                                <span class="product-badge sale">
+                                    @if (activeSpecial.DiscountType == HamroGrocery.Models.Entities.DiscountType.BuyOneGetOne)
+                                    {
+                                        <text>BOGO</text>
+                                    }
+                                    else if (activeSpecial.DiscountType == HamroGrocery.Models.Entities.DiscountType.BuyTwoGetOne)
+                                    {
+                                        <text>Buy 2 Get 1</text>
+                                    }
+                                    else
+                                    {
+                                        <text>@savingsPercent.ToString("F0")% OFF</text>
+                                    }
+                                </span>
+                            }
+                            else if ((DateTime.Now - product.CreatedAt).TotalDays < 7)
+                            {
+                                <span class="product-badge new">NEW</span>
+                            }
+
+                            <!-- Quick Actions -->
+                            <div class="product-quick-actions">
+                                <button class="quick-action-btn" title="Quick View">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="quick-action-btn" title="Add to Wishlist">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="product-content">
+                            <div class="product-category">
+                                @(product.Category?.CategoryName ?? "Groceries")
+                            </div>
+
+                            <h3 class="product-name">
+                                <a href="@Url.Action("Details", "Products", new { id = product.Id })">
+                                    @product.ProductName
+                                </a>
+                            </h3>
+
+                            <div class="product-price-wrapper">
+                                @if (activeSpecial != null && discountedPrice < product.Price)
+                                {
+                                    <span class="product-price">$@discountedPrice.ToString("N2")</span>
+                                    <span class="product-price-old">$@product.Price.ToString("N2")</span>
+                                }
+                                else
+                                {
+                                    <span class="product-price">$@product.Price.ToString("N2")</span>
+                                }
+                            </div>
+
+                            @if (product.StockQuantity > 0)
+                            {
+                                if (product.StockQuantity <= product.ReorderPoint)
+                                {
+                                    <div class="stock-badge low">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        Only @product.StockQuantity left
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="stock-badge in-stock">
+                                        <i class="fas fa-check-circle"></i>
+                                        In Stock
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="stock-badge out">
+                                    <i class="fas fa-times-circle"></i>
+                                    Out of Stock
+                                </div>
+                            }
+
+                            <!-- Add to Cart Button -->
+                            @if (product.StockQuantity > 0)
+                            {
+                                <button class="btn-add-to-cart"
+                                        data-product-id="@product.Id"
+                                        data-variation-id="@(product.ProductVariations?.FirstOrDefault()?.Id ?? 0)"
+                                        data-product-name="@product.ProductName"
+                                        data-product-price="@discountedPrice"
+                                        onclick="addToCart(this)">
+                                    <i class="fas fa-cart-plus"></i>
+                                    Add to Cart
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn-add-to-cart" disabled>
+                                    <i class="fas fa-ban"></i>
+                                    Out of Stock
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- View All Button -->
+            <div class="text-center mt-5">
+                <a href="@Url.Action("Index", "Products")" class="btn-view-all">
+                    <i class="fas fa-th-large me-2"></i>
+                    Browse All @Model.Statistics.TotalProducts+ Products
+                </a>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- Why Choose Us - Minimal -->
+<section class="features-mini">
+    <div class="container">
+        <div class="features-grid">
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-truck-fast"></i>
+                </div>
+                <div>
+                    <h4>Same-Day Delivery</h4>
+                    <p>Order before 2 PM for same-day dispatch across Sydney</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <div>
+                    <h4>Farm Fresh Quality</h4>
+                    <p>Direct from trusted suppliers • Fresh guarantee</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-check"></i>
+                </div>
+                <div>
+                    <h4>Secure Payment</h4>
+                    <p>Visa, MasterCard, PayPal & Cash on Delivery</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@functions {
+    // Helper function to map category names to emojis/icons
+    string GetCategoryIcon(string categoryName)
+    {
+        return categoryName.ToLower() switch
+        {
+            var name when name.Contains("rice") || name.Contains("grain") => "🌾",
+            var name when name.Contains("spice") => "🌶️",
+            var name when name.Contains("dal") || name.Contains("lentil") => "🫘",
+            var name when name.Contains("vegetable") => "🥬",
+            var name when name.Contains("snack") => "🍪",
+            var name when name.Contains("dairy") || name.Contains("milk") => "🥛",
+            var name when name.Contains("oil") || name.Contains("ghee") => "🧴",
+            var name when name.Contains("flour") || name.Contains("atta") => "🌾",
+            var name when name.Contains("tea") || name.Contains("coffee") => "☕",
+            var name when name.Contains("sweet") || name.Contains("mithai") => "🍬",
+            var name when name.Contains("frozen") => "❄️",
+            var name when name.Contains("pickle") || name.Contains("achaar") => "🥒",
+            var name when name.Contains("sauce") || name.Contains("chutney") => "🍯",
+            var name when name.Contains("bread") || name.Contains("roti") => "🍞",
+            var name when name.Contains("fruit") => "🍎",
+            _ => "🛒" // Default grocery icon
+        };
+    }
+}
+
+@section Scripts {
+    <script src="~/js/home.js" asp-append-version="true"></script>
+}

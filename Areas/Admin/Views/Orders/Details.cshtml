@@ -1,0 +1,193 @@
+﻿@model HamroGrocery.Models.Entities.Order
+@{
+    ViewData["Title"] = $"Order Details - #{Model.Id}";
+    var isDelivered = Model.Status == HamroGrocery.Models.Entities.OrderStatus.Delivered;
+    var isCancelled = Model.Status == HamroGrocery.Models.Entities.OrderStatus.Cancelled;
+}
+
+<div class="container-fluid py-4">
+    <!-- Header + Edit Button -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Order #@Model.Id</h2>
+            <p class="text-muted mb-0">
+                Placed on @Model.OrderDate.ToString("dd MMM yyyy, hh:mm tt")
+                • <strong>@Model.PaymentMethod</strong>
+                @if (Model.IsCashOnDelivery)
+                {
+                    <span class="badge bg-warning text-dark ms-2">COD</span>
+                }
+            </p>
+        </div>
+        <div>
+            @if (!isDelivered && !isCancelled)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-lg">
+                    Update Status
+                </a>
+            }
+            else
+            {
+                <button class="btn btn-secondary btn-lg" disabled>
+                    @(isDelivered ? "Delivered" : "Cancelled")
+                </button>
+            }
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Left: Order Items -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex justify-content-between">
+                    <h5 class="mb-0">Order Items (@Model.TotalItems)</h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Product</th>
+                                <th class="text-center">Qty</th>
+                                <th class="text-end">Price</th>
+                                <th class="text-end">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.OrderItems)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            @if (item.Product?.ImagePath != null)
+                                            {
+                                                <img src="@item.Product.ImagePath" alt="@item.ProductName"
+                                                     class="me-3 rounded" style="width:60px;height:60px;object-fit:cover;">
+                                            }
+                                            <div>
+                                                <strong>@item.ProductName</strong>
+                                                @if (!string.IsNullOrEmpty(item.ProductVariation?.VariationName))
+                                                {
+                                                    <br>
+                                            
+                                                    <small class="text-muted">@item.ProductVariation.VariationName</small>
+                                                }
+                                                <br><small class="text-muted">SKU: @item.SKU</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center fw-bold">@item.Quantity</td>
+                                    <td class="text-end">AUD @item.UnitPrice.ToString("N0")</td>
+                                    <td class="text-end fw-bold text-primary">AUD @item.TotalPrice.ToString("N0")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="col-lg-4">
+
+            <!-- Order Summary -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between py-2">
+                        <span>Subtotal</span>
+                        <strong>AUD @Model.SubTotal.ToString("N0")</strong>
+                    </div>
+                    <div class="d-flex justify-content-between py-2">
+                        <span>Tax (13% VAT)</span>
+                        <strong>AUD @Model.TaxAmount.ToString("N0")</strong>
+                    </div>
+                    <div class="d-flex justify-content-between py-2">
+                        <span>Shipping</span>
+                        <strong>AUD @Model.ShippingAmount.ToString("N0")</strong>
+                    </div>
+                    <hr class="my-3">
+                    <div class="d-flex justify-content-between py-3">
+                        <h5>Total Paid</h5>
+                        <h4 class="text-primary">AUD @Model.TotalAmount.ToString("N0")</h4>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <div class="d-flex justify-content-between mb-2">
+                            <strong>Status:</strong>
+                            <span class="badge fs-6 bg-@(Model.Status == OrderStatus.Delivered ? "success" :
+                                                                                         Model.Status == OrderStatus.Pending ? "warning" :
+                                                                                         Model.Status == OrderStatus.Processing ? "info" :
+                                                                                         Model.Status == OrderStatus.Shipped ? "primary" :
+                                                                                         Model.Status == OrderStatus.Cancelled ? "danger" : "secondary")">
+                                @Model.Status
+                            </span>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.TrackingNumber))
+                        {
+                            <div class="d-flex justify-content-between">
+                                <strong>Tracking #:</strong>
+                                <span class="font-monospace">@Model.TrackingNumber</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delivery Details -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        @(Model.IsDelivery ? "Delivery Address" : "Pickup Location")
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="fw-bold">@Model.CustomerName</h6>
+                    <p class="mb-1">@Model.CustomerPhone</p>
+                    <p class="mb-2"><a href="mailto:@Model.CustomerEmail">@Model.CustomerEmail</a></p>
+                    <hr>
+                    @if (Model.IsDelivery)
+                    {
+                        <p class="mb-1">@Model.ShippingAddress</p>
+                        @if (!string.IsNullOrEmpty(Model.ShippingSuburb))
+                        {
+                            <p class="mb-1">@Model.ShippingSuburb, @Model.ShippingCity</p>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.ShippingPostcode))
+                        {
+                            <p class="mb-0">@Model.ShippingState @Model.ShippingPostcode</p>
+                        }
+                    }
+                    else
+                    {
+                        <p class="mb-1">@Model.PickupLocation</p>
+                        @if (Model.EstimatedPickupTime.HasValue)
+                        {
+                            <p class="mb-0">Ready: @Model.EstimatedPickupTime.Value.ToString("dd MMM, hh:mm tt")</p>
+                        }
+                    }
+                    @if (!string.IsNullOrEmpty(Model.DeliveryInstructions))
+                    {
+                        <hr>
+                        <small class="text-primary">"@Model.DeliveryInstructions"</small>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+            Back to Orders
+        </a>
+    </div>
+</div>

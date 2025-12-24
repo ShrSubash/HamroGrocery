@@ -1,0 +1,405 @@
+﻿@model HamroGrocery.Models.Entities.Category
+@{
+    ViewData["Title"] = $"Edit Category - {Model.CategoryName}";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    :root {
+        --primary: #10b981;
+        --primary-dark: #059669;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-900: #111827;
+        --danger: #ef4444;
+    }
+
+    .modern-form {
+        padding: 24px;
+        background: var(--gray-50);
+    }
+
+    .page-header {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid var(--gray-200);
+    }
+
+        .page-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+            .page-header h2 i {
+                color: var(--primary);
+            }
+
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+    }
+
+    .card-header-modern {
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--gray-200);
+        background: var(--gray-50);
+    }
+
+        .card-header-modern h4 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .card-header-modern h4 i {
+                color: var(--primary);
+            }
+
+    .card-body {
+        padding: 24px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: 8px;
+        display: block;
+    }
+
+        .form-label i {
+            color: var(--primary);
+        }
+
+    .form-control {
+        border: 1.5px solid var(--gray-200);
+        border-radius: 8px;
+        padding: 11px 14px;
+        font-size: 14px;
+        color: var(--gray-900);
+        transition: all 0.2s;
+        width: 100%;
+    }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+            outline: none;
+        }
+
+    textarea.form-control {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .icon-input-group {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+        .icon-input-group input {
+            flex: 1;
+        }
+
+    .icon-preview {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .form-check {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        background: var(--gray-50);
+        border-radius: 8px;
+        border: 1.5px solid var(--gray-200);
+    }
+
+    .form-check-input {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        border: 2px solid var(--gray-200);
+        margin: 0;
+    }
+
+        .form-check-input:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+    .form-check-label {
+        margin-left: 10px;
+        cursor: pointer;
+        color: var(--gray-700);
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+        .form-check-label i {
+            color: var(--primary);
+        }
+
+    .btn {
+        padding: 11px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            color: white;
+        }
+
+    .btn-secondary {
+        background: transparent;
+        color: var(--gray-600);
+        border: 1.5px solid var(--gray-200);
+    }
+
+        .btn-secondary:hover {
+            border-color: var(--gray-600);
+            color: var(--gray-700);
+            background: var(--gray-50);
+        }
+
+    .form-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid var(--gray-200);
+    }
+
+    .alert-danger {
+        background: rgba(239, 68, 68, 0.1);
+        border-left: 4px solid var(--danger);
+        color: #dc2626;
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin-bottom: 24px;
+    }
+
+    .text-danger {
+        color: var(--danger);
+        font-size: 12px;
+        margin-top: 4px;
+        display: block;
+    }
+
+    .text-muted {
+        color: var(--gray-600);
+        font-size: 12px;
+    }
+
+    @@media (max-width: 768px) {
+        .modern-form
+
+    {
+        padding: 16px;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .form-footer {
+        flex-direction: column-reverse;
+        gap: 12px;
+    }
+
+        .form-footer .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+    }
+</style>
+
+<div class="modern-form">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h2>
+            <i class="fas fa-edit"></i>
+            Edit Category
+        </h2>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Back
+        </a>
+    </div>
+
+    <!-- Validation Summary -->
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert-danger">
+            <h6><i class="fas fa-exclamation-triangle me-2"></i>Please correct the following errors:</h6>
+            <div asp-validation-summary="All"></div>
+        </div>
+    }
+
+    <!-- Edit Form -->
+    <div class="form-card">
+        <div class="card-header-modern">
+            <h4>
+                <i class="fas fa-info-circle"></i>
+                Category Information
+            </h4>
+        </div>
+
+        <div class="card-body">
+            <form asp-action="Edit" method="post" novalidate>
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="CreatedAt" />
+                <input type="hidden" asp-for="IsDeleted" />
+
+                <div class="form-group">
+                    <label asp-for="CategoryName" class="form-label">
+                        <i class="fas fa-tag"></i> Category Name *
+                    </label>
+                    <input asp-for="CategoryName" class="form-control"
+                           placeholder="Enter category name" required />
+                    <span asp-validation-for="CategoryName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Icon" class="form-label">
+                        <i class="fas fa-icons"></i> Category Icon (Emoji)
+                    </label>
+                    <div class="icon-input-group">
+                        <input asp-for="Icon" class="form-control" id="iconInput"
+                               placeholder="🥬 (Optional emoji icon)" maxlength="10" />
+                        <div class="icon-preview" id="iconPreview">@(Model.Icon ?? "🛒")</div>
+                    </div>
+                    <small class="text-muted d-block mt-1">
+                        <i class="fas fa-lightbulb"></i>
+                        Enter an emoji like 🥬, 🌾, 🍖, or leave blank for default
+                    </small>
+                    <span asp-validation-for="Icon" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="DisplayOrder" class="form-label">
+                        <i class="fas fa-sort-numeric-down"></i> Display Order
+                    </label>
+                    <input asp-for="DisplayOrder" type="number" class="form-control"
+                           placeholder="0" min="0" />
+                    <small class="text-muted d-block mt-1">
+                        <i class="fas fa-info-circle"></i>
+                        Lower numbers appear first (0 = top position)
+                    </small>
+                    <span asp-validation-for="DisplayOrder" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Description" class="form-label">
+                        <i class="fas fa-align-left"></i> Description
+                    </label>
+                    <textarea asp-for="Description" class="form-control" rows="4"
+                              placeholder="Enter category description"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-check">
+                        <input asp-for="IsActive" class="form-check-input" type="checkbox" id="isActive" />
+                        <label asp-for="IsActive" class="form-check-label" for="isActive">
+                            <i class="fas fa-toggle-on"></i> Active (visible to customers)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-footer">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </a>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        Update Category
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Icon preview
+        const iconInput = document.getElementById('iconInput');
+        const iconPreview = document.getElementById('iconPreview');
+
+        if (iconInput && iconPreview) {
+            iconInput.addEventListener('input', function() {
+                iconPreview.textContent = this.value.trim() || '🛒';
+            });
+        }
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const categoryName = document.querySelector('#CategoryName');
+
+            if (!categoryName.value.trim()) {
+                e.preventDefault();
+                categoryName.classList.add('is-invalid');
+                categoryName.focus();
+                return false;
+            }
+        });
+    </script>
+}

@@ -1,0 +1,260 @@
+﻿@model List<HamroGrocery.Models.Entities.ProductVariation>
+@{
+    ViewData["Title"] = "Product Variations";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .page-header {
+        background: white;
+        border-radius: 16px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(231, 76, 60, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+        }
+
+    .content-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(231, 76, 60, 0.1);
+        overflow: hidden;
+        position: relative;
+    }
+
+        .content-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+        }
+
+    .table thead th {
+        background: linear-gradient(45deg, #e74c3c, #c0392b);
+        color: white;
+        border: none;
+        font-weight: 600;
+        padding: 15px;
+    }
+
+    .table tbody tr:hover {
+        background: rgba(231, 76, 60, 0.05);
+        transform: translateX(5px);
+    }
+
+    .badge.bg-success {
+        background: linear-gradient(45deg, #27ae60, #2ecc71) !important;
+    }
+
+    .badge.bg-secondary {
+        background: linear-gradient(45deg, #7f8c8d, #95a5a6) !important;
+    }
+
+    .stock-indicator {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 8px;
+    }
+
+    .stock-high {
+        background: #27ae60;
+    }
+
+    .stock-medium {
+        background: #f39c12;
+    }
+
+    .stock-low {
+        background: #e74c3c;
+    }
+
+    .stock-out {
+        background: #7f8c8d;
+    }
+</style>
+
+<!-- Success Message -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        <i class="fas fa-check-circle me-2"></i>
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<!-- Page Header -->
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2><i class="fas fa-layer-group me-2" style="color: #e74c3c;"></i>Product Variations</h2>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Add New Variation
+        </a>
+    </div>
+</div>
+
+<!-- Statistics Row -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-number">@Model.Count</div>
+            <div class="stat-label">Total Variations</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-number">@Model.Count(v => v.IsActive)</div>
+            <div class="stat-label">Active Variations</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-number">@Model.Count(v => v.StockQuantity <= v.ReorderPoint)</div>
+            <div class="stat-label">Low Stock</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-number">@Model.Count(v => v.StockQuantity == 0)</div>
+            <div class="stat-label">Out of Stock</div>
+        </div>
+    </div>
+</div>
+
+<!-- Product Variations Table -->
+<div class="content-card">
+    <div class="card-header" style="padding: 20px 25px; border-bottom: 1px solid rgba(0, 0, 0, 0.05); background: rgba(231, 76, 60, 0.02);">
+        <h4 class="mb-0" style="color: #2c3e50; font-weight: 600;">
+            <i class="fas fa-list me-2" style="color: #e74c3c;"></i>Variations List
+        </h4>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-box me-2"></i>Product</th>
+                        <th><i class="fas fa-expand-alt me-2"></i>Size</th>
+                        <th><i class="fas fa-balance-scale me-2"></i>Unit</th>
+                        <th><i class="fas fa-dollar-sign me-2"></i>Price</th>
+                        <th><i class="fas fa-warehouse me-2"></i>Stock</th>
+                        <th><i class="fas fa-toggle-on me-2"></i>Status</th>
+                        <th><i class="fas fa-cogs me-2"></i>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var variation in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="product-name" style="font-weight: 600; color: #2c3e50;">
+                                    @variation.Product?.ProductName
+                                </div>
+                                @if (!string.IsNullOrEmpty(variation.VariationName))
+                                {
+                                    <small class="text-muted">@variation.VariationName</small>
+                                }
+                            </td>
+                            <td>
+                                <strong>@variation.Size</strong>
+                            </td>
+                            <td>
+                                @variation.Unit
+                            </td>
+                            <td>
+                                <span class="product-price" style="font-weight: 700; color: #e74c3c;">
+                                    AUD @variation.Price.ToString("N2")
+                                </span>
+                            </td>
+                            <td>
+                                <span class="stock-indicator @(variation.StockQuantity == 0 ? "stock-out" :
+                                                                                                  variation.StockQuantity <= 10 ? "stock-low" :
+                                                                                                  variation.StockQuantity <= 50 ? "stock-medium" : "stock-high")"></span>
+                        <strong>@variation.StockQuantity</strong>
+                        @if (variation.StockQuantity == 0)
+                                {
+                                    <small class="text-danger d-block">Out of Stock</small>
+                                }
+                                else if (variation.StockQuantity <= variation.ReorderPoint)
+                                {
+                                    <small class="text-warning d-block">Low Stock</small>
+                                }
+                            </td>
+                            <td>
+                                @if (variation.IsActive)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactive</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a asp-action="Details" asp-route-id="@variation.Id" class="btn btn-sm btn-outline-info" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@variation.Id" class="btn btn-sm btn-outline-warning" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@variation.Id" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this variation?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="empty-state" style="text-align: center; padding: 60px 20px; color: #7f8c8d;">
+            <i class="fas fa-layer-group" style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5; color: #e74c3c;"></i>
+            <h4 style="margin-bottom: 15px; color: #2c3e50;">No Product Variations Found</h4>
+            <p>Start by adding variations to your products.</p>
+            <a asp-action="Create" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus me-2"></i>Add First Variation
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Add animation to table rows
+        document.addEventListener('DOMContentLoaded', function() {
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach((row, index) => {
+                row.style.opacity = '0';
+                row.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    row.style.transition = 'all 0.5s ease';
+                    row.style.opacity = '1';
+                    row.style.transform = 'translateY(0)';
+                }, index * 50);
+            });
+        });
+    </script>
+}

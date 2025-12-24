@@ -1,0 +1,764 @@
+﻿@model HamroGrocery.Models.ViewModels.ProductDetailsViewModel
+@{
+    ViewData["Title"] = Model.Product.ProductName;
+
+    // Safe description handling
+    var description = Model.Product.Description ?? string.Empty;
+
+    var shortDescription = description.Length > 150
+        ? description.Substring(0, 150)
+        : description;
+
+    var metaDescription = !string.IsNullOrEmpty(Model.Product.MetaDescription)
+        ? Model.Product.MetaDescription
+        : shortDescription;
+}
+
+
+
+@section Styles {
+    <style>
+        /* Product Details Page Styles */
+        .product-details-section {
+            padding: 40px 0;
+            background: #f8f9fa;
+        }
+
+        .breadcrumb-custom {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+            .breadcrumb-custom a {
+                color: #e74c3c;
+                text-decoration: none;
+                font-weight: 500;
+            }
+
+                .breadcrumb-custom a:hover {
+                    text-decoration: underline;
+                }
+
+        .product-detail-card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+
+        /* Image Gallery */
+        .product-gallery {
+            position: sticky;
+            top: 100px;
+        }
+
+        .main-image-wrapper {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #f8f9fa;
+            aspect-ratio: 1;
+            margin-bottom: 20px;
+        }
+
+        .main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 20px;
+        }
+
+        .product-badge-detail {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+        }
+
+            .product-badge-detail.new {
+                background: linear-gradient(135deg, #27ae60, #2ecc71);
+            }
+
+        /* Product Info */
+        .product-info {
+            padding-left: 30px;
+        }
+
+        .product-category-tag {
+            display: inline-block;
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .product-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+
+        .product-rating {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stars {
+            color: #f39c12;
+            font-size: 1.1rem;
+        }
+
+        .rating-text {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+        }
+
+        /* Price Section */
+        .price-section {
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.05), rgba(192, 57, 43, 0.05));
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+            border: 2px solid rgba(231, 76, 60, 0.1);
+        }
+
+        .current-price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #e74c3c;
+            margin-bottom: 5px;
+        }
+
+        .original-price {
+            font-size: 1.3rem;
+            color: #95a5a6;
+            text-decoration: line-through;
+            margin-left: 15px;
+        }
+
+        .savings-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+
+        /* Stock Status */
+        .stock-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 15px 0;
+        }
+
+            .stock-status.in-stock {
+                background: rgba(39, 174, 96, 0.1);
+                color: #27ae60;
+            }
+
+            .stock-status.low-stock {
+                background: rgba(243, 156, 18, 0.1);
+                color: #f39c12;
+            }
+
+            .stock-status.out-of-stock {
+                background: rgba(231, 76, 60, 0.1);
+                color: #e74c3c;
+            }
+
+        /* Description */
+        .product-description {
+            margin: 30px 0;
+            padding-top: 30px;
+            border-top: 2px solid #ecf0f1;
+        }
+
+        .description-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .description-text {
+            color: #5a6c7d;
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+
+        /* Variations */
+        .variations-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .variation-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+            .variation-item:hover {
+                border-color: #e74c3c;
+                transform: translateX(5px);
+            }
+
+        /* Quantity Selector */
+        .quantity-section {
+            margin: 25px 0;
+        }
+
+        .quantity-selector {
+            display: inline-flex;
+            align-items: center;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .qty-btn {
+            background: #f8f9fa;
+            border: none;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+        }
+
+            .qty-btn:hover {
+                background: #e74c3c;
+                color: white;
+            }
+
+        .qty-input {
+            border: none;
+            width: 60px;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* Add to Cart Button */
+        .btn-add-to-cart {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.3);
+        }
+
+            .btn-add-to-cart-detail:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 12px 35px rgba(231, 76, 60, 0.4);
+            }
+
+            .btn-add-to-cart-detail:disabled {
+                background: #95a5a6;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+        .btn-buy-now {
+            background: white;
+            color: #e74c3c;
+            border: 2px solid #e74c3c;
+            padding: 16px 35px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 15px;
+        }
+
+            .btn-buy-now:hover {
+                background: #e74c3c;
+                color: white;
+            }
+
+        /* Related Products */
+        .related-products {
+            margin-top: 60px;
+        }
+
+        .section-title-related {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .related-product-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+
+            .related-product-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+            }
+
+        .related-product-image {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: contain;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            padding: 15px;
+        }
+
+        .related-product-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .related-product-price {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #e74c3c;
+        }
+
+        @@media (max-width: 768px) {
+            .product-info
+
+        {
+            padding-left: 0;
+            margin-top: 30px;
+        }
+
+        .product-title {
+            font-size: 1.6rem;
+        }
+
+        .current-price {
+            font-size: 2rem;
+        }
+
+        .btn-buy-now {
+            margin-left: 0;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        }
+    </style>
+}
+
+<!-- Breadcrumb -->
+<div class="container">
+    <div class="breadcrumb-custom">
+        <a href="@Url.Action("Index", "Home")">Home</a>
+        <i class="fas fa-chevron-right mx-2 text-muted"></i>
+        <a href="@Url.Action("Index", "Products")">Products</a>
+        <i class="fas fa-chevron-right mx-2 text-muted"></i>
+        <a href="@Url.Action("Index", "Products", new { category = Model.Product.Category?.CategoryName })">
+            @(Model.Product.Category?.CategoryName ?? "All")
+        </a>
+        <i class="fas fa-chevron-right mx-2 text-muted"></i>
+        <span class="text-muted">@Model.Product.ProductName</span>
+    </div>
+</div>
+
+<!-- Product Details -->
+<section class="product-details-section">
+    <div class="container">
+        <div class="product-detail-card">
+            <div class="row">
+                <!-- Product Gallery -->
+                <div class="col-lg-5">
+                    <div class="product-gallery">
+                        <div class="main-image-wrapper">
+                            <img src="@(Model.Product.ImagePath ?? "/images/no-image.jpg")"
+                                 alt="@Model.Product.ProductName"
+                                 class="main-image"
+                                 onerror="this.src='/images/no-image.jpg'">
+
+                            @if (Model.ActiveSpecial != null)
+                            {
+                                <div class="product-badge-detail">
+                                    @if (Model.ActiveSpecial.DiscountType == HamroGrocery.Models.Entities.DiscountType.BuyOneGetOne)
+                                    {
+                                        <text>BOGO DEAL</text>
+                                    }
+                                    else if (Model.ActiveSpecial.DiscountType == HamroGrocery.Models.Entities.DiscountType.BuyTwoGetOne)
+                                    {
+                                        <text>Buy 2 Get 1 FREE</text>
+                                    }
+                                    else
+                                    {
+                                        <text>@Model.SavingsPercent% OFF</text>
+                                    }
+                                </div>
+                            }
+                            else if ((DateTime.Now - Model.Product.CreatedAt).TotalDays < 7)
+                            {
+                                <div class="product-badge-detail new">NEW ARRIVAL</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Info -->
+                <div class="col-lg-7">
+                    <div class="product-info">
+                        <!-- Category Tag -->
+                        <span class="product-category-tag">
+                            <i class="fas fa-tag me-1"></i>
+                            @(Model.Product.Category?.CategoryName ?? "Groceries")
+                        </span>
+
+                        <!-- Product Title -->
+                        <h1 class="product-title">@Model.Product.ProductName</h1>
+
+                        <!-- Rating (Placeholder for future) -->
+                        <div class="product-rating">
+                            <div class="stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span class="rating-text">4.5 (128 reviews)</span>
+                        </div>
+
+                        <!-- Price Section -->
+                        <div class="price-section">
+                            <div>
+                                <span class="current-price">$@Model.DiscountedPrice.ToString("N2")</span>
+                                @if (Model.ActiveSpecial != null && Model.DiscountedPrice < Model.Product.Price)
+                                {
+                                    <span class="original-price">$@Model.Product.Price.ToString("N2")</span>
+                                    <span class="savings-badge">
+                                        Save $@Model.SavingsAmount.ToString("N2")
+                                    </span>
+                                }
+                            </div>
+                            <small class="text-muted d-block mt-2">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Tax included. Shipping calculated at checkout.
+                            </small>
+                        </div>
+
+                        <!-- Stock Status -->
+                        @if (Model.IsInStock)
+                        {
+                            if (Model.IsLowStock)
+                            {
+                                <div class="stock-status low-stock">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Only @Model.Product.StockQuantity left in stock - Order soon!
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="stock-status in-stock">
+                                    <i class="fas fa-check-circle"></i>
+                                    In Stock - Ready to ship
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="stock-status out-of-stock">
+                                <i class="fas fa-times-circle"></i>
+                                Currently out of stock
+                            </div>
+                        }
+
+                        <!-- Variations (if any) -->
+                        @if (Model.Variations.Any())
+                        {
+                            <div class="variations-section">
+                                <h5 class="mb-3"><strong>Available Variations:</strong></h5>
+                                @foreach (var variation in Model.Variations)
+                                {
+                                    <div class="variation-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>@variation.Size @variation.Unit</strong>
+                                                @if (!string.IsNullOrEmpty(variation.VariationName))
+                                                {
+                                                    <span class="text-muted ms-2">(@variation.VariationName)</span>
+                                                }
+                                            </div>
+                                            <div>
+                                                <span class="fw-bold text-success">$@variation.Price.ToString("N2")</span>
+                                                <small class="text-muted ms-2">Stock: @variation.StockQuantity</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        <!-- Quantity Selector -->
+                        @if (Model.IsInStock)
+                        {
+                            <div class="quantity-section">
+                                <label class="d-block mb-2 fw-bold">Quantity:</label>
+                                <div class="quantity-selector">
+                                    <button class="qty-btn" onclick="decreaseQty()">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <input type="number"
+                                           id="quantity"
+                                           class="qty-input"
+                                           value="1"
+                                           min="1"
+                                           max="@Model.Product.StockQuantity"
+                                           readonly>
+                                    <button class="qty-btn" onclick="increaseQty()">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="mt-4">
+                                <button class="btn-add-to-cart"
+                                        data-product-id="@Model.Product.Id"
+                                        data-product-name="@Model.Product.ProductName"
+                                        data-product-price="@Model.DiscountedPrice">
+                                    <i class="fas fa-cart-plus"></i>
+                                    Add to Cart
+                                </button>
+                                <button id="buyNowBtn" class="btn-add-to-cart" style="background: linear-gradient(135deg, #f39c12, #e67e22);">
+                                    <i class="fas fa-bolt"></i> Buy Now
+                                </button>
+                            </div>
+                        }
+                        else
+                        {
+                            <button class="btn-add-to-cart-detail" disabled>
+                                <i class="fas fa-ban"></i>
+                                Out of Stock
+                            </button>
+                        }
+
+                        <!-- Product Description -->
+                        @if (!string.IsNullOrEmpty(Model.Product.Description))
+                        {
+                            <div class="product-description">
+                                <h5 class="description-title">Product Description</h5>
+                                <p class="description-text">@Model.Product.Description</p>
+                            </div>
+                        }
+
+                        <!-- Additional Info -->
+                        <div class="product-description">
+                            <h5 class="description-title">Product Information</h5>
+                            <table class="table table-sm">
+                                <tbody>
+                                    @if (!string.IsNullOrEmpty(Model.Product.SKU))
+                                    {
+                                        <tr>
+                                            <td class="fw-bold">SKU:</td>
+                                            <td>@Model.Product.SKU</td>
+                                        </tr>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.Product.Barcode))
+                                    {
+                                        <tr>
+                                            <td class="fw-bold">Barcode:</td>
+                                            <td>@Model.Product.Barcode</td>
+                                        </tr>
+                                    }
+                                    @if (Model.Product.Weight.HasValue)
+                                    {
+                                        <tr>
+                                            <td class="fw-bold">Weight:</td>
+                                            <td>@Model.Product.Weight.Value kg</td>
+                                        </tr>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.Product.Unit))
+                                    {
+                                        <tr>
+                                            <td class="fw-bold">Unit:</td>
+                                            <td>@Model.Product.Unit</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Related Products -->
+        @if (Model.RelatedProducts.Any())
+        {
+            <div class="related-products">
+                <h2 class="section-title-related">You May Also Like</h2>
+                <div class="related-grid">
+                    @foreach (var relatedProduct in Model.RelatedProducts)
+                    {
+                        <div class="related-product-card">
+                            <a href="@Url.Action("Details", new { id = relatedProduct.Id })">
+                                <img src="@(relatedProduct.ImagePath ?? "/images/no-image.jpg")"
+                                     alt="@relatedProduct.ProductName"
+                                     class="related-product-image"
+                                     onerror="this.src='/images/no-image.jpg'">
+                            </a>
+                            <div class="related-product-name">
+                                <a href="@Url.Action("Details", new { id = relatedProduct.Id })"
+                                   style="text-decoration: none; color: inherit;">
+                                    @relatedProduct.ProductName
+                                </a>
+                            </div>
+                            <div class="related-product-price">
+                                $@relatedProduct.Price.ToString("N2")
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+
+   @section Scripts {
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        const stripe = Stripe('@@(Configuration["Stripe:PublishableKey"])'); // Will be injected from appsettings
+
+        // Quantity Controls
+        const maxQty = @Model.Product.StockQuantity;
+
+        function increaseQty() {
+            const input = document.getElementById('quantity');
+            if (parseInt(input.value) < maxQty) input.value = parseInt(input.value) + 1;
+        }
+
+        function decreaseQty() {
+            const input = document.getElementById('quantity');
+            if (parseInt(input.value) > 1) input.value = parseInt(input.value) - 1;
+        }
+
+
+        // ============= FIXED: BUY NOW BUTTON =============
+        document.getElementById('buyNowBtn')?.addEventListener('click', async function () {
+            const btn = this;
+            const originalHtml = btn.innerHTML;
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const productId = @Model.Product.Id;
+
+            if (quantity < 1) {
+                showToast('error', 'Please select quantity');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding to Cart...';
+
+            try {
+                // Add to cart
+                const addRes = await fetch('/Cart/AddToCart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    },
+                    body: JSON.stringify({ productId, quantity })
+                });
+
+                if (!addRes.ok) {
+                    throw new Error("Failed to add to cart");
+                }
+
+                const addData = await addRes.json();
+
+                if (addData.success) {
+                    // Show success message
+                    showToast('success', 'Added to cart! Redirecting to checkout...');
+
+                    // Redirect to checkout page after short delay
+                    setTimeout(() => {
+                        window.location.href = '/checkout';
+                    }, 1000);
+                } else {
+                    throw new Error(addData.message || "Failed to add to cart");
+                }
+
+            } catch (err) {
+                console.error('Buy Now error:', err);
+                showToast('error', err.message || 'Failed to proceed. Please try again.');
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        });
+
+        // Toast Notification (reuse your existing one)
+        function showToast(type, message) {
+            const bg = type === 'success' ? '#27ae60' : '#e74c3c';
+            const toast = `
+                <div style="position:fixed;top:90px;right:20px;background:${bg};color:white;padding:15px 25px;border-radius:12px;box-shadow:0 8px 25px rgba(0,0,0,0.3);z-index:9999;animation:slideIn 0.4s ease">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>${message}
+                </div>`;
+            document.body.insertAdjacentHTML('beforeend', toast);
+            setTimeout(() => document.querySelector('.toast-notification:last-child')?.remove(), 4000);
+        }
+
+        // Animation
+        const style = document.createElement('style');
+        style.textContent = `@@keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }`;
+        document.head.appendChild(style);
+    </script>
+
+    <script src="~/js/home.js" asp-append-version="true"></script>
+}

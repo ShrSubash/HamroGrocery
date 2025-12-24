@@ -1,0 +1,218 @@
+﻿@using HamroGrocery.Models.Entities
+@model Order
+
+@{
+    ViewData["Title"] = "Invoice - Order #" + Model.OrderNumber;
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-9">
+
+            <!-- INVOICE CARD - This is the only thing that will print -->
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden invoice-card">
+                <div class="card-header bg-gradient text-white text-center py-4" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                    <h1 class="mb-2 fw-bold">INVOICE</h1>
+                    <h4 class="mb-0">Order #@Model.OrderNumber</h4>
+                </div>
+
+                <div class="card-body p-5">
+                    <!-- Order Info -->
+                    <div class="row mb-5">
+                        <div class="col-md-6">
+                            <h5 class="fw-bold text-danger mb-3">Order Details</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td class="text-muted">Order Date</td>
+                                    <td class="fw-bold">@Model.OrderDate.ToString("dd MMMM yyyy, hh:mm tt")</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Status</td>
+                                    <td>
+                                        <span class="badge rounded-pill px-3 py-2
+                                            @(Model.Status == OrderStatus.Delivered ? "bg-success" :
+                                                                                            Model.Status == OrderStatus.Shipped ? "bg-primary" :
+                                                                                            Model.Status == OrderStatus.Processing || Model.Status == OrderStatus.Confirmed ? "bg-info" :
+                                                                                            Model.Status == OrderStatus.Pending ? "bg-warning text-dark" :
+                                                                                            Model.Status == OrderStatus.Cancelled || Model.Status == OrderStatus.Refunded ? "bg-secondary" : "bg-danger")">
+                                            @Model.Status
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Payment Method</td>
+                                    <td class="fw-bold">@(Model.IsCashOnDelivery ? "Cash on Delivery" : "Online Payment")</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Payment Status</td>
+                                    <td class="fw-bold @(Model.PaymentStatus == "Paid" ? "text-success" : "text-warning")">@Model.PaymentStatus</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <button onclick="printInvoice()" class="btn btn-success btn-lg px-5 no-print">
+                                Print Invoice
+                            </button>
+                        </div>
+                    </div>
+
+                    <hr class="my-5">
+
+                    <!-- Customer & Delivery Info -->
+                    <div class="row mb-5">
+                        <div class="col-md-6">
+                            <h5 class="fw-bold text-danger mb-3">Bill To</h5>
+                            <p class="mb-1 fw-bold">@Model.CustomerName</p>
+                            <p class="mb-1">@Model.CustomerPhone</p>
+                            @if (!string.IsNullOrEmpty(Model.CustomerEmail))
+                            {
+                                <p class="mb-1">@Model.CustomerEmail</p>
+                            }
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="fw-bold text-danger mb-3">
+                                @(Model.IsDelivery ? "Delivery Address" : "Pickup Location")
+                            </h5>
+                            <p class="mb-1">@Model.ShippingAddress</p>
+                            @if (!string.IsNullOrEmpty(Model.DeliveryInstructions))
+                            {
+                                <div class="alert alert-info mt-3 small">
+                                    <strong>Note:</strong> @Model.DeliveryInstructions
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Order Items Table -->
+                    <h5 class="fw-bold text-danger mb-4">Order Items</h5>
+                    <div class="table-responsive mb-5">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-danger text-white">
+                                <tr>
+                                    <th>Product</th>
+                                    <th class="text-center">Qty</th>
+                                    <th class="text-end">Unit Price</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.OrderItems)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong>@item.ProductName</strong>
+                                            @if (!string.IsNullOrEmpty(item.SKU))
+                                            {
+                                                <br />
+                                        
+                                                <small class="text-muted">SKU: @item.SKU</small>
+                                            }
+                                        </td>
+                                        <td class="text-center fw-bold">@item.Quantity</td>
+                                        <td class="text-end">AUD @item.UnitPrice.ToString("N0")</td>
+                                        <td class="text-end fw-bold text-danger">AUD @item.TotalPrice.ToString("N0")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Summary -->
+                    <div class="row justify-content-end">
+                        <div class="col-md-5 col-lg-4">
+                            <div class="bg-light rounded-3 p-4">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Subtotal</span>
+                                    <strong>AUD @Model.SubTotal.ToString("N0")</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Tax (13% VAT)</span>
+                                    <strong>AUD @Model.TaxAmount.ToString("N0")</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-3 text-muted">
+                                    <span>@(Model.IsDelivery ? "Delivery Charge" : "Service Fee")</span>
+                                    <strong>@(Model.ShippingCost == 0 ? "FREE" : "AUD " + Model.ShippingCost.ToString("N0"))</strong>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between">
+                                    <h5 class="fw-bold">Total Amount</h5>
+                                    <h4 class="fw-bold text-danger">AUD @Model.TotalAmount.ToString("N0")</h4>
+                                </div>
+                                @if (Model.IsCashOnDelivery)
+                                {
+                                    <div class="alert alert-warning mt-4 mb-0">
+                                        <strong>Cash on Delivery:</strong> Please keep exact amount ready.
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Back Button (hidden when printing) -->
+                    <div class="text-center mt-5 no-print">
+                        <a asp-controller="Orders" asp-action="Index" class="btn btn-outline-danger btn-lg px-5">
+                            Back to My Orders
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thank You Note (only on screen) -->
+            <div class="text-center mt-5 text-muted no-print">
+                <h4>Thank you for shopping with <span class="text-danger fw-bold">HamroGrocery</span>!</h4>
+                <p>Questions? Contact us at support@hamrogrocery.com.np</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <style>
+        @@media print {
+            /* Hide everything except the invoice */
+            body * {
+                visibility: hidden;
+            }
+
+            .invoice-card, .invoice-card * {
+                visibility: visible;
+            }
+
+            .invoice-card {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                border: none !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+            }
+
+            .card-header {
+                background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .no-print, .btn, nav, header, footer, aside {
+                display: none !important;
+            }
+
+            body {
+                background: white !important;
+                padding: 20px !important;
+            }
+
+            @@page {
+                margin: 1cm;
+                size: A4 portrait;
+            }
+        }
+    </style>
+
+    <script>
+        function printInvoice() {
+            window.print();
+        }
+    </script>
+}

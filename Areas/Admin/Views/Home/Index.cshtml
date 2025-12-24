@@ -1,0 +1,1629 @@
+﻿@model HamroGrocery.Models.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<section class="dashboard modern-dashboard">
+    <!-- Welcome Section -->
+    <div class="welcome-section animate-fade-in">
+        <div class="welcome-content">
+            <div class="greeting-badge">
+                <i class="fas fa-sparkles"></i>
+                <span>@DateTime.Now.ToString("dddd")</span>
+            </div>
+            <h1>Welcome back, @(User.Identity?.Name?.Split('@')[0] ?? "Admin")!</h1>
+            <p>Here's your store performance overview</p>
+            <div class="quick-metrics">
+                <div class="quick-metric-item">
+                    <i class="fas fa-calendar-day"></i>
+                    <span>@DateTime.Now.ToString("MMM dd, yyyy")</span>
+                </div>
+                <div class="quick-metric-item highlight">
+                    <i class="fas fa-dollar-sign"></i>
+                    <span>Today: <strong>AUD @Model.TodaysSales.ToString("N2")</strong></span>
+                </div>
+            </div>
+        </div>
+        <div class="welcome-illustration">
+            <i class="fas fa-chart-line"></i>
+        </div>
+    </div>
+
+    <!-- Enhanced Key Metrics -->
+    <div class="stats-grid">
+        <div class="stat-card primary-card animate-slide-up" style="animation-delay: 0.1s;">
+            <div class="stat-header">
+                <div class="stat-icon primary">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-trend positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>@Model.SalesGrowthPercentage%</span>
+                </div>
+            </div>
+            <div class="stat-body">
+                <span class="stat-label">Total Sales</span>
+                <h3 class="stat-value">AUD @Model.TotalSales.ToString("N2")</h3>
+                <p class="stat-meta">
+                    <span class="badge-soft success">This Month</span>
+                    <span class="stat-subtext">Avg: AUD @Model.AverageOrderValue.ToString("N2")</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="stat-card success-card animate-slide-up" style="animation-delay: 0.2s;">
+            <div class="stat-header">
+                <div class="stat-icon success">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="stat-trend positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>@Model.OrdersGrowthPercentage%</span>
+                </div>
+            </div>
+            <div class="stat-body">
+                <span class="stat-label">Total Orders</span>
+                <h3 class="stat-value">@Model.TotalOrders</h3>
+                <p class="stat-meta">
+                    <span class="badge-soft success">This Week</span>
+                    <span class="stat-subtext">Weekly: AUD @Model.WeeklySales.ToString("N2")</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="stat-card warning-card animate-slide-up" style="animation-delay: 0.3s;">
+            <div class="stat-header">
+                <div class="stat-icon warning">
+                    <i class="fas fa-box"></i>
+                </div>
+                <div class="stat-trend @(Model.LowStockCount > 0 ? "negative" : "neutral")">
+                    <i class="fas @(Model.LowStockCount > 0 ? "fa-exclamation-triangle" : "fa-check")"></i>
+                    <span>@Model.LowStockCount</span>
+                </div>
+            </div>
+            <div class="stat-body">
+                <span class="stat-label">Active Products</span>
+                <h3 class="stat-value">@Model.ActiveProducts</h3>
+                <p class="stat-meta">
+                    <span class="badge-soft warning">Low Stock</span>
+                    <span class="stat-subtext">@Model.OutOfStockCount out of stock</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="stat-card info-card animate-slide-up" style="animation-delay: 0.4s;">
+            <div class="stat-header">
+                <div class="stat-icon info">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-trend positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>@Model.CustomersGrowthPercentage%</span>
+                </div>
+            </div>
+            <div class="stat-body">
+                <span class="stat-label">Total Customers</span>
+                <h3 class="stat-value">@Model.TotalCustomers</h3>
+                <p class="stat-meta">
+                    <span class="badge-soft info">Active</span>
+                    <span class="stat-subtext">@Model.TotalCategories categories</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row g-4 mb-4">
+        <!-- Main Sales Chart -->
+        <div class="col-lg-8">
+            <div class="content-card chart-card">
+                <div class="card-header-modern">
+                    <div class="header-left">
+                        <h5 class="card-title">
+                            <i class="fas fa-chart-area"></i>
+                            Sales & Revenue Analytics
+                        </h5>
+                        <p class="card-subtitle">Track your performance trends</p>
+                    </div>
+                    <div class="chart-filters">
+                        <div class="filter-group">
+                            <label>Period</label>
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-filter period-btn active" data-period="7days">7D</button>
+                                <button type="button" class="btn btn-filter period-btn" data-period="30days">30D</button>
+                                <button type="button" class="btn btn-filter period-btn" data-period="90days">90D</button>
+                                <button type="button" class="btn btn-filter period-btn" data-period="365days">1Y</button>
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <label>Group By</label>
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-filter group-btn active" data-group="day">Day</button>
+                                <button type="button" class="btn btn-filter group-btn" data-group="week">Week</button>
+                                <button type="button" class="btn btn-filter group-btn" data-group="month">Month</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart Summary Stats -->
+                <div class="chart-summary">
+                    <div class="summary-item">
+                        <span class="summary-label">Total Revenue</span>
+                        <h4 id="chartTotalRevenue" class="summary-value">AUD @Model.TotalSales.ToString("N2")</h4>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Orders</span>
+                        <h4 id="chartTotalOrders" class="summary-value">@Model.TotalOrders</h4>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Avg Order</span>
+                        <h4 id="chartAvgOrder" class="summary-value">AUD @Model.AverageOrderValue.ToString("N2")</h4>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Change</span>
+                        <h4 id="chartComparison" class="summary-value text-success">
+                            <i class="fas fa-arrow-up"></i> +@Model.SalesGrowthPercentage%
+                        </h4>
+                    </div>
+                </div>
+
+                <div class="chart-wrapper">
+                    <canvas id="mainSalesChart"></canvas>
+                </div>
+
+                <div class="chart-loading d-none">
+                    <div class="spinner-border" role="status"></div>
+                    <p>Updating data...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-lg-4">
+            <!-- Orders Status Donut -->
+            <div class="content-card chart-card mb-4">
+                <div class="card-header-modern">
+                    <h5 class="card-title">
+                        <i class="fas fa-chart-pie"></i>
+                        Orders by Status
+                    </h5>
+                </div>
+                <div class="chart-wrapper-small">
+                    <canvas id="ordersStatusChart"></canvas>
+                </div>
+                <div class="status-legend">
+                    @foreach (var status in Model.OrdersByStatus)
+                    {
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background-color: @GetStatusColor(status.Key)"></span>
+                            <span class="legend-label">@status.Key</span>
+                            <span class="legend-value">@status.Value</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Quick Stats Card -->
+            <div class="content-card">
+                <div class="card-header-modern">
+                    <h5 class="card-title">
+                        <i class="fas fa-bolt"></i>
+                        Quick Stats
+                    </h5>
+                </div>
+                <div class="quick-stats-list">
+                    <div class="quick-stat-row">
+                        <div class="stat-icon-wrapper primary">
+                            <i class="fas fa-calendar-week"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-name">This Week</span>
+                            <strong class="stat-amount">AUD @Model.WeeklySales.ToString("N2")</strong>
+                        </div>
+                    </div>
+                    <div class="quick-stat-row">
+                        <div class="stat-icon-wrapper success">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-name">Today</span>
+                            <strong class="stat-amount">AUD @Model.TodaysSales.ToString("N2")</strong>
+                        </div>
+                    </div>
+                    <div class="quick-stat-row">
+                        <div class="stat-icon-wrapper info">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-name">Avg Order Value</span>
+                            <strong class="stat-amount">AUD @Model.AverageOrderValue.ToString("N2")</strong>
+                        </div>
+                    </div>
+                    <div class="quick-stat-row">
+                        <div class="stat-icon-wrapper danger">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-name">Out of Stock</span>
+                            <strong class="stat-amount">@Model.OutOfStockCount items</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders and Alerts Row -->
+    <div class="row g-4 mb-4">
+        <!-- Recent Orders -->
+        <div class="col-lg-8">
+            <div class="content-card">
+                <div class="card-header-modern">
+                    <div class="header-left">
+                        <h5 class="card-title">
+                            <i class="fas fa-receipt"></i>
+                            Recent Orders
+                        </h5>
+                        <p class="card-subtitle">Latest delivered orders</p>
+                    </div>
+                    <a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="btn btn-sm btn-outline-primary">
+                        View All <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+                @if (Model.RecentOrders.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table modern-table">
+                            <thead>
+                                <tr>
+                                    <th>Order</th>
+                                    <th>Customer</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Amount</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var o in Model.RecentOrders.Take(8))
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="order-info">
+                                                <strong class="order-number">@o.OrderNumber</strong>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="customer-cell">
+                                                <div class="customer-avatar">@o.CustomerInitials</div>
+                                                <span class="customer-name">@o.CustomerName</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="date-cell">
+                                                <span class="date-main">@o.OrderDate.ToString("dd MMM")</span>
+                                                <span class="date-time">@o.OrderDate.ToString("hh:mm tt")</span>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge badge-success">@o.Status</span></td>
+                                        <td><strong class="amount">AUD @o.TotalAmount.ToString("N2")</strong></td>
+                                        <td>
+                                            <a asp-area="Admin" asp-controller="Orders" asp-action="Details" asp-route-id="@o.OrderId"
+                                               class="btn btn-sm btn-action" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <i class="fas fa-shopping-cart"></i>
+                        <p>No orders yet</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Alerts & Actions -->
+        <div class="col-lg-4">
+            <!-- Alerts -->
+            <div class="content-card mb-4">
+                <div class="card-header-modern">
+                    <h5 class="card-title">
+                        <i class="fas fa-bell"></i>
+                        Alerts
+                    </h5>
+                </div>
+                <div class="alerts-container">
+                    @foreach (var alert in Model.Alerts)
+                    {
+                        var alertClass = alert.Type.ToLower() switch
+                        {
+                            "danger" => "alert-danger",
+                            "warning" => "alert-warning",
+                            "info" => "alert-info",
+                            "success" => "alert-success",
+                            _ => "alert-info"
+                        };
+
+                        if (alert.Title.Contains("Low Stock") || alert.Title.Contains("Out of Stock"))
+                        {
+                            <a asp-area="Admin" asp-controller="Inventory" asp-action="Index" class="alert-box @alertClass">
+                                <div class="alert-icon">
+                                    <i class="@alert.Icon"></i>
+                                </div>
+                                <div class="alert-content">
+                                    <strong class="alert-title">@alert.Title</strong>
+                                    <p class="alert-desc">@alert.Description</p>
+                                </div>
+                                <i class="fas fa-chevron-right alert-arrow"></i>
+                            </a>
+                        }
+                        else if (alert.Title.Contains("Pending") || alert.Title.Contains("Processing"))
+                        {
+                            <a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="alert-box @alertClass">
+                                <div class="alert-icon">
+                                    <i class="@alert.Icon"></i>
+                                </div>
+                                <div class="alert-content">
+                                    <strong class="alert-title">@alert.Title</strong>
+                                    <p class="alert-desc">@alert.Description</p>
+                                </div>
+                                <i class="fas fa-chevron-right alert-arrow"></i>
+                            </a>
+                        }
+                        else
+                        {
+                            <div class="alert-box @alertClass">
+                                <div class="alert-icon">
+                                    <i class="@alert.Icon"></i>
+                                </div>
+                                <div class="alert-content">
+                                    <strong class="alert-title">@alert.Title</strong>
+                                    <p class="alert-desc">@alert.Description</p>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="content-card">
+                <div class="card-header-modern">
+                    <h5 class="card-title">
+                        <i class="fas fa-zap"></i>
+                        Quick Actions
+                    </h5>
+                </div>
+                <div class="quick-actions">
+                    <a asp-area="Admin" asp-controller="Products" asp-action="Create" class="action-btn primary">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Add Product</span>
+                    </a>
+                    <a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="action-btn success">
+                        <i class="fas fa-list-ul"></i>
+                        <span>Manage Orders</span>
+                    </a>
+                    <a asp-area="Admin" asp-controller="Categories" asp-action="Index" class="action-btn info">
+                        <i class="fas fa-tags"></i>
+                        <span>Categories</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Selling Products -->
+    <div class="content-card">
+        <div class="card-header-modern">
+            <div class="header-left">
+                <h5 class="card-title">
+                    <i class="fas fa-fire"></i>
+                    Top Selling Products
+                </h5>
+                <p class="card-subtitle">Best performers this month</p>
+            </div>
+            <a asp-area="Admin" asp-controller="Products" asp-action="Index" class="btn btn-sm btn-outline-primary">
+                View All <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        @if (Model.TopProducts.Any())
+        {
+            <div class="products-grid">
+                @foreach (var p in Model.TopProducts.Take(5))
+                {
+                    <div class="product-card-compact">
+                        <div class="product-image-wrapper">
+                            <img src="@p.ImageUrl" alt="@p.ProductName" class="product-image"
+                                 onerror="this.src='https://via.placeholder.com/60x60/f0f0f0/999999?text=No+Image'" />
+                            <span class="badge @p.StockBadgeClass stock-badge">@p.StockStatus</span>
+                        </div>
+                        <div class="product-details">
+                            <h6 class="product-name">@p.ProductName</h6>
+                            <span class="product-category">@p.CategoryName</span>
+                        </div>
+                        <div class="product-metrics">
+                            <div class="metric-item">
+                                <i class="fas fa-box"></i>
+                                <span>@p.UnitsSold sold</span>
+                            </div>
+                            <div class="metric-item revenue">
+                                <i class="fas fa-dollar-sign"></i>
+                                <strong>AUD @p.Revenue.ToString("N2")</strong>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fas fa-box"></i>
+                <p>No sales data available</p>
+            </div>
+        }
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let mainChart;
+        let currentPeriod = '7days';
+        let currentGroupBy = 'day';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeMainChart();
+            initializeOrdersStatusChart();
+            attachFilterListeners();
+        });
+
+        function initializeMainChart() {
+            const ctx = document.getElementById('mainSalesChart');
+
+            mainChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [@Html.Raw(string.Join(",", Model.MonthlySalesData.Keys.Select(k => $"\"{k}\"")))],
+                    datasets: [{
+                        label: 'Sales (AUD)',
+                        data: [@Html.Raw(string.Join(",", Model.MonthlySalesData.Values))],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        pointBackgroundColor: '#10b981',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointHoverBackgroundColor: '#059669',
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(17, 24, 39, 0.95)',
+                            padding: 12,
+                            titleFont: { size: 13, weight: '600' },
+                            bodyFont: { size: 14 },
+                            cornerRadius: 8,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Revenue: AUD ' + context.parsed.y.toLocaleString('en-US', {minimumFractionDigits: 2});
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.04)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return 'AUD ' + value.toLocaleString();
+                                },
+                                font: { size: 11 },
+                                color: '#6b7280'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: { size: 11 },
+                                color: '#6b7280',
+                                maxRotation: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeOrdersStatusChart() {
+            const ctx = document.getElementById('ordersStatusChart');
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [@Html.Raw(string.Join(",", Model.OrdersByStatus.Keys.Select(k => $"\"{k}\"")))],
+                    datasets: [{
+                        data: [@Html.Raw(string.Join(",", Model.OrdersByStatus.Values))],
+                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'],
+                        borderWidth: 0,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(17, 24, 39, 0.95)',
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function attachFilterListeners() {
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentPeriod = this.dataset.period;
+                    updateChartData();
+                });
+            });
+
+            document.querySelectorAll('.group-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.group-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentGroupBy = this.dataset.group;
+                    updateChartData();
+                });
+            });
+        }
+
+        async function updateChartData() {
+            try {
+                showLoading(true);
+                const response = await fetch(`/Admin/Home/GetChartData?period=${currentPeriod}&groupBy=${currentGroupBy}`);
+                const data = await response.json();
+
+                mainChart.data.labels = Object.keys(data.salesData);
+                mainChart.data.datasets[0].data = Object.values(data.salesData);
+                mainChart.update('active');
+
+                updateChartStats(data);
+                showLoading(false);
+            } catch (error) {
+                console.error('Error updating chart:', error);
+                showLoading(false);
+            }
+        }
+
+        function updateChartStats(data) {
+            document.getElementById('chartTotalRevenue').textContent = 'AUD ' + data.totalRevenue.toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.getElementById('chartTotalOrders').textContent = data.totalOrders.toLocaleString();
+            document.getElementById('chartAvgOrder').textContent = 'AUD ' + data.averageOrderValue.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+            const comparisonEl = document.getElementById('chartComparison');
+            const isPositive = data.comparisonPercentage >= 0;
+            comparisonEl.className = isPositive ? 'summary-value text-success' : 'summary-value text-danger';
+            comparisonEl.innerHTML = `<i class="fas fa-arrow-${isPositive ? 'up' : 'down'}"></i> ${isPositive ? '+' : ''}${data.comparisonPercentage}%`;
+        }
+
+        function showLoading(show) {
+            const chartContainer = document.querySelector('.chart-wrapper');
+            const loadingEl = document.querySelector('.chart-loading');
+
+            if (show) {
+                chartContainer.style.opacity = '0.5';
+                loadingEl.classList.remove('d-none');
+            } else {
+                chartContainer.style.opacity = '1';
+                loadingEl.classList.add('d-none');
+            }
+        }
+    </script>
+}
+
+@functions {
+    string GetStatusColor(string status)
+    {
+        return status switch
+        {
+            "Delivered" => "#10b981",
+            "Processing" => "#3b82f6",
+            "Pending" => "#f59e0b",
+            "Cancelled" => "#ef4444",
+            _ => "#8b5cf6"
+        };
+    }
+}
+
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    :root {
+        --primary: #10b981;
+        --primary-dark: #059669;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #3b82f6;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --radius: 12px;
+        --radius-lg: 16px;
+    }
+
+    * {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .modern-dashboard {
+        padding: 24px;
+        background: var(--gray-50);
+        min-height: 100vh;
+    }
+
+    /* Welcome Section - Sleek Modern Design */
+    .welcome-section {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border-radius: var(--radius-lg);
+        padding: 32px;
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: white;
+        box-shadow: var(--shadow-md);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .welcome-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+    .welcome-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .greeting-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 12px;
+    }
+
+    .welcome-section h1 {
+        font-size: 32px;
+        font-weight: 700;
+        margin: 0 0 8px 0;
+        letter-spacing: -0.5px;
+    }
+
+    .welcome-section p {
+        opacity: 0.95;
+        margin: 0 0 16px 0;
+        font-size: 15px;
+    }
+
+    .quick-metrics {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .quick-metric-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        padding: 10px 16px;
+        border-radius: 10px;
+        font-size: 14px;
+    }
+
+        .quick-metric-item.highlight {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+    .welcome-illustration {
+        font-size: 120px;
+        opacity: 0.1;
+        position: relative;
+        z-index: 0;
+    }
+
+    /* Stats Grid - Modern Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: var(--radius);
+        padding: 20px;
+        box-shadow: var(--shadow);
+        transition: all 0.3s ease;
+        border: 1px solid var(--gray-200);
+    }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+    .stat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 16px;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: white;
+    }
+
+        .stat-icon.primary {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .stat-icon.success {
+            background: linear-gradient(135deg, #10b981, #047857);
+        }
+
+        .stat-icon.warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .stat-icon.info {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+
+    .stat-trend {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+        .stat-trend.positive {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .stat-trend.negative {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .stat-trend.neutral {
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+
+    .stat-label {
+        font-size: 13px;
+        color: var(--gray-500);
+        font-weight: 500;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin: 0 0 12px 0;
+        letter-spacing: -0.5px;
+    }
+
+    .stat-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .badge-soft {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+        .badge-soft.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .badge-soft.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+
+        .badge-soft.info {
+            background: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+        }
+
+    .stat-subtext {
+        font-size: 12px;
+        color: var(--gray-500);
+    }
+
+    /* Content Cards */
+    .content-card {
+        background: white;
+        border-radius: var(--radius);
+        padding: 24px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+    }
+
+    .card-header-modern {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .card-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--gray-900);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .card-subtitle {
+        font-size: 13px;
+        color: var(--gray-500);
+        margin: 4px 0 0 0;
+    }
+
+    /* Chart Filters */
+    .chart-filters {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .filter-group label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+    .btn-filter {
+        border: 1px solid var(--gray-300);
+        background: white;
+        color: var(--gray-700);
+        padding: 6px 12px;
+        font-size: 12px;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+        .btn-filter:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-400);
+        }
+
+        .btn-filter.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+    /* Chart Summary */
+    .chart-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 16px;
+        padding: 20px;
+        background: var(--gray-50);
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    .summary-item {
+        text-align: center;
+    }
+
+    .summary-label {
+        font-size: 12px;
+        color: var(--gray-500);
+        font-weight: 500;
+        display: block;
+        margin-bottom: 6px;
+    }
+
+    .summary-value {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin: 0;
+    }
+
+    .chart-wrapper {
+        height: 320px;
+        position: relative;
+    }
+
+    .chart-wrapper-small {
+        height: 220px;
+        position: relative;
+    }
+
+    .chart-loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        z-index: 10;
+    }
+
+        .chart-loading .spinner-border {
+            color: var(--primary);
+        }
+
+        .chart-loading p {
+            margin-top: 12px;
+            color: var(--gray-600);
+            font-size: 14px;
+        }
+
+    /* Status Legend */
+    .status-legend {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 16px;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        background: var(--gray-50);
+        border-radius: 8px;
+    }
+
+    .legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .legend-label {
+        flex: 1;
+        font-size: 13px;
+        color: var(--gray-700);
+        font-weight: 500;
+    }
+
+    .legend-value {
+        font-weight: 700;
+        font-size: 14px;
+        color: var(--gray-900);
+    }
+
+    /* Quick Stats List */
+    .quick-stats-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .quick-stat-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: var(--gray-50);
+        border-radius: 10px;
+        transition: all 0.2s;
+    }
+
+        .quick-stat-row:hover {
+            background: var(--gray-100);
+        }
+
+    .stat-icon-wrapper {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        color: white;
+        flex-shrink: 0;
+    }
+
+        .stat-icon-wrapper.primary {
+            background: var(--primary);
+        }
+
+        .stat-icon-wrapper.success {
+            background: var(--success);
+        }
+
+        .stat-icon-wrapper.info {
+            background: var(--info);
+        }
+
+        .stat-icon-wrapper.danger {
+            background: var(--danger);
+        }
+
+    .stat-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .stat-name {
+        font-size: 12px;
+        color: var(--gray-600);
+    }
+
+    .stat-amount {
+        font-size: 15px;
+        color: var(--gray-900);
+        font-weight: 600;
+    }
+
+    /* Modern Table */
+    .modern-table {
+        margin: 0;
+    }
+
+        .modern-table thead th {
+            background: var(--gray-50);
+            border: none;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--gray-600);
+            padding: 12px 16px;
+        }
+
+        .modern-table tbody tr {
+            border-bottom: 1px solid var(--gray-100);
+            transition: all 0.2s;
+        }
+
+            .modern-table tbody tr:hover {
+                background: var(--gray-50);
+            }
+
+        .modern-table tbody td {
+            padding: 14px 16px;
+            vertical-align: middle;
+            font-size: 14px;
+        }
+
+    .order-number {
+        color: var(--gray-900);
+        font-size: 14px;
+    }
+
+    .customer-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .customer-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 12px;
+        flex-shrink: 0;
+    }
+
+    .customer-name {
+        font-size: 14px;
+        color: var(--gray-700);
+    }
+
+    .date-cell {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .date-main {
+        font-size: 14px;
+        color: var(--gray-900);
+        font-weight: 500;
+    }
+
+    .date-time {
+        font-size: 12px;
+        color: var(--gray-500);
+    }
+
+    .badge {
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        border: none;
+    }
+
+    .badge-success {
+        background: rgba(16, 185, 129, 0.1);
+        color: #059669;
+    }
+
+    .amount {
+        font-size: 15px;
+        color: var(--gray-900);
+    }
+
+    .btn-action {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--gray-300);
+        background: white;
+        color: var(--gray-600);
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+
+        .btn-action:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+    /* Alerts */
+    .alerts-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .alert-box {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px;
+        border-radius: 10px;
+        text-decoration: none;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+    }
+
+        .alert-box:hover {
+            text-decoration: none;
+            transform: translateX(4px);
+        }
+
+    .alert-danger {
+        background: rgba(239, 68, 68, 0.08);
+        border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    .alert-warning {
+        background: rgba(245, 158, 11, 0.08);
+        border-color: rgba(245, 158, 11, 0.2);
+    }
+
+    .alert-info {
+        background: rgba(59, 130, 246, 0.08);
+        border-color: rgba(59, 130, 246, 0.2);
+    }
+
+    .alert-success {
+        background: rgba(16, 185, 129, 0.08);
+        border-color: rgba(16, 185, 129, 0.2);
+    }
+
+    .alert-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .alert-danger .alert-icon {
+        background: rgba(239, 68, 68, 0.15);
+        color: #dc2626;
+    }
+
+    .alert-warning .alert-icon {
+        background: rgba(245, 158, 11, 0.15);
+        color: #d97706;
+    }
+
+    .alert-info .alert-icon {
+        background: rgba(59, 130, 246, 0.15);
+        color: #2563eb;
+    }
+
+    .alert-success .alert-icon {
+        background: rgba(16, 185, 129, 0.15);
+        color: #059669;
+    }
+
+    .alert-content {
+        flex: 1;
+    }
+
+    .alert-title {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--gray-900);
+        margin-bottom: 2px;
+    }
+
+    .alert-desc {
+        margin: 0;
+        font-size: 12px;
+        color: var(--gray-600);
+    }
+
+    .alert-arrow {
+        color: var(--gray-400);
+        font-size: 14px;
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .action-btn {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+    }
+
+        .action-btn:hover {
+            text-decoration: none;
+            transform: translateX(4px);
+        }
+
+        .action-btn.primary {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        .action-btn.success {
+            background: rgba(16, 185, 129, 0.08);
+            color: #047857;
+            border-color: rgba(16, 185, 129, 0.15);
+        }
+
+        .action-btn.info {
+            background: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+            border-color: rgba(59, 130, 246, 0.2);
+        }
+
+    /* Products Grid - COMPACT MODERN DESIGN */
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+        gap: 12px;
+    }
+
+    .product-card-compact {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px;
+        background: white;
+        border: 1px solid var(--gray-200);
+        border-radius: 12px;
+        transition: all 0.2s;
+    }
+
+        .product-card-compact:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+    .product-image-wrapper {
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .product-image {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 1px solid var(--gray-200);
+    }
+
+    .stock-badge {
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        font-size: 9px;
+        padding: 3px 6px;
+        border-radius: 4px;
+    }
+
+    .product-details {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .product-name {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--gray-900);
+        margin: 0 0 4px 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .product-category {
+        font-size: 12px;
+        color: var(--gray-500);
+        background: var(--gray-100);
+        padding: 3px 10px;
+        border-radius: 6px;
+        display: inline-block;
+    }
+
+    .product-metrics {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        align-items: flex-end;
+        flex-shrink: 0;
+    }
+
+    .metric-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: var(--gray-600);
+    }
+
+        .metric-item.revenue {
+            color: var(--primary);
+        }
+
+        .metric-item strong {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .metric-item i {
+            font-size: 12px;
+        }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 48px 20px;
+        color: var(--gray-400);
+    }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.4;
+        }
+
+        .empty-state p {
+            margin: 0;
+            font-size: 14px;
+            color: var(--gray-500);
+        }
+
+    /* Animations */
+    .animate-fade-in {
+        animation: fadeIn 0.6s ease-out;
+    }
+
+    .animate-slide-up {
+        animation: slideUp 0.5s ease-out;
+    }
+
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+
+    }
+
+    @@keyframes slideUp {
+        from
+
+    {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .modern-dashboard
+
+    {
+        padding: 16px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .welcome-section {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .welcome-illustration {
+        font-size: 80px;
+        margin-top: 16px;
+    }
+
+    .chart-filters {
+        width: 100%;
+    }
+
+    .filter-group {
+        flex: 1;
+    }
+
+    .chart-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
+
+    }
+</style>

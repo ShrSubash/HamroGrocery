@@ -1,0 +1,668 @@
+@model HamroGrocery.Models.ViewModels.UserManagementViewModel
+@{
+    ViewData["Title"] = "User Management";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .users-page {
+        padding-bottom: 50px;
+    }
+
+    .page-header {
+        background: white;
+        padding: 30px;
+        border-radius: 16px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        border: 1px solid #e9ecef;
+    }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+            .page-header h1 i {
+                color: #e74c3c;
+            }
+
+        .page-header .stats-row {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+            .page-header .stats-row .stat-item {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                color: #6c757d;
+                font-size: 0.95rem;
+            }
+
+                .page-header .stats-row .stat-item strong {
+                    color: #2c3e50;
+                    font-weight: 600;
+                }
+
+    /* Tier Distribution Pills */
+    .tier-pills {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+    }
+
+    .tier-pill {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .tier-pill.bronze {
+            background: linear-gradient(135deg, #cd7f32, #b8753f);
+            color: white;
+        }
+
+        .tier-pill.silver {
+            background: linear-gradient(135deg, #c0c0c0, #a8a8a8);
+            color: white;
+        }
+
+        .tier-pill.gold {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #2c3e50;
+        }
+
+        .tier-pill.platinum {
+            background: linear-gradient(135deg, #e5e4e2, #b7b6b4);
+            color: #2c3e50;
+        }
+
+        .tier-pill.diamond {
+            background: linear-gradient(135deg, #b9f2ff, #7dd3fc);
+            color: #2c3e50;
+        }
+
+    /* Filters Section */
+    .filters-section {
+        background: white;
+        padding: 24px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        border: 1px solid #e9ecef;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.15);
+            outline: none;
+        }
+
+    /* Users Grid */
+    .users-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 24px;
+    }
+
+    .user-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .user-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #e74c3c, #c0392b);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .user-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            border-color: #e74c3c;
+        }
+
+            .user-card:hover::before {
+                opacity: 1;
+            }
+
+        .user-card .user-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+            .user-card .user-header .avatar {
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #e74c3c, #c0392b);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 1.5rem;
+                font-weight: 700;
+                flex-shrink: 0;
+                box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+            }
+
+            .user-card .user-header .user-info {
+                flex: 1;
+                min-width: 0;
+            }
+
+                .user-card .user-header .user-info .user-name {
+                    font-size: 1.1rem;
+                    font-weight: 700;
+                    color: #2c3e50;
+                    margin-bottom: 4px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .user-card .user-header .user-info .user-email {
+                    font-size: 0.85rem;
+                    color: #6c757d;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+        .user-card .user-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+            .user-card .user-stats .stat {
+                text-align: center;
+            }
+
+                .user-card .user-stats .stat .stat-value {
+                    font-size: 1.3rem;
+                    font-weight: 700;
+                    color: #2c3e50;
+                    display: block;
+                }
+
+                .user-card .user-stats .stat .stat-label {
+                    font-size: 0.75rem;
+                    color: #6c757d;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+
+        .user-card .user-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+            .user-card .user-meta .meta-item {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                color: #6c757d;
+            }
+
+                .user-card .user-meta .meta-item i {
+                    width: 16px;
+                    color: #e74c3c;
+                }
+
+        .user-card .user-badges {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .user-card .user-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+            .user-card .user-actions .btn {
+                padding: 10px;
+                border-radius: 8px;
+                font-size: 0.9rem;
+                font-weight: 600;
+                transition: all 0.2s ease;
+            }
+
+    /* Badges */
+    .badge {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .badge.tier-bronze {
+        background: linear-gradient(135deg, #cd7f32, #b8753f);
+        color: white;
+    }
+
+    .badge.tier-silver {
+        background: linear-gradient(135deg, #c0c0c0, #a8a8a8);
+        color: white;
+    }
+
+    .badge.tier-gold {
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+        color: #2c3e50;
+    }
+
+    .badge.tier-platinum {
+        background: linear-gradient(135deg, #e5e4e2, #b7b6b4);
+        color: #2c3e50;
+    }
+
+    .badge.tier-diamond {
+        background: linear-gradient(135deg, #b9f2ff, #7dd3fc);
+        color: #2c3e50;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        border: none;
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #c0392b, #a93226);
+            color: white;
+        }
+
+    .btn-outline-primary {
+        border: 2px solid #e74c3c;
+        color: #e74c3c;
+        background: white;
+    }
+
+        .btn-outline-primary:hover {
+            background: #e74c3c;
+            color: white;
+            border-color: #e74c3c;
+        }
+
+    .btn-outline-success {
+        border: 2px solid #27ae60;
+        color: #27ae60;
+        background: white;
+    }
+
+        .btn-outline-success:hover {
+            background: #27ae60;
+            color: white;
+            border-color: #27ae60;
+        }
+
+    .btn-outline-secondary {
+        border: 2px solid #6c757d;
+        color: #6c757d;
+        background: white;
+    }
+
+        .btn-outline-secondary:hover {
+            background: #6c757d;
+            color: white;
+            border-color: #6c757d;
+        }
+
+    /* Empty State */
+    .empty-state {
+        background: white;
+        border-radius: 16px;
+        padding: 60px 20px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        border: 1px solid #e9ecef;
+    }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .empty-state p {
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .users-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .page-header .stats-row {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .tier-pills {
+            gap: 8px;
+        }
+    }
+</style>
+
+<div class="users-page">
+    <div class="container-fluid">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
+                <h1><i class="fas fa-users"></i>User Management</h1>
+                <div class="d-flex gap-2">
+                    <form asp-action="RecalculateStatistics" method="post" style="display: inline;">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-outline-info" onclick="return confirm('Recalculate statistics for all users? This may take a moment.');">
+                            <i class="fas fa-sync-alt me-2"></i>Recalculate Stats
+                        </button>
+                    </form>
+                    <a asp-area="Admin" asp-controller="LoyaltySettings" asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-crown me-2"></i>Loyalty Settings
+                    </a>
+                    <a asp-action="Create" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Add New User
+                    </a>
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="stats-row">
+                <div class="stat-item">
+                    <i class="fas fa-users"></i>
+                    <span>Total: <strong>@Model.Statistics.TotalUsers</strong></span>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-check-circle" style="color: #27ae60;"></i>
+                    <span>Active: <strong>@Model.Statistics.ActiveUsers</strong></span>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-user-plus" style="color: #3498db;"></i>
+                    <span>New This Month: <strong>@Model.Statistics.NewUsersThisMonth</strong></span>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-dollar-sign" style="color: #f39c12;"></i>
+                    <span>Revenue: <strong>AUD @Model.Statistics.TotalRevenue.ToString("N2")</strong></span>
+                </div>
+            </div>
+
+            <!-- Tier Distribution -->
+            <div class="tier-pills">
+                <div class="tier-pill bronze">
+                    <i class="fas fa-medal"></i>
+                    <span>Bronze: @Model.Statistics.BronzeUsers</span>
+                </div>
+                <div class="tier-pill silver">
+                    <i class="fas fa-medal"></i>
+                    <span>Silver: @Model.Statistics.SilverUsers</span>
+                </div>
+                <div class="tier-pill gold">
+                    <i class="fas fa-medal"></i>
+                    <span>Gold: @Model.Statistics.GoldUsers</span>
+                </div>
+                <div class="tier-pill platinum">
+                    <i class="fas fa-medal"></i>
+                    <span>Platinum: @Model.Statistics.PlatinumUsers</span>
+                </div>
+                <div class="tier-pill diamond">
+                    <i class="fas fa-gem"></i>
+                    <span>Diamond: @Model.Statistics.DiamondUsers</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-section">
+            <form method="get" asp-action="Index">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" name="searchTerm" class="form-control" placeholder="Search users..." value="@ViewData["SearchTerm"]">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <select name="role" class="form-select">
+                            <option value="">All Roles</option>
+                            <option value="Customer" @@(ViewData["Role"]?.ToString() == "Customer" ? "selected" : "")>Customer</option>
+                            <option value="Vendor" @@(ViewData["Role"]?.ToString() == "Vendor" ? "selected" : "")>Vendor</option>
+                            <option value="Manager" @@(ViewData["Role"]?.ToString() == "Manager" ? "selected" : "")>Manager</option>
+                            <option value="Admin" @@(ViewData["Role"]?.ToString() == "Admin" ? "selected" : "")>Admin</option>
+                            <option value="SuperAdmin" @@(ViewData["Role"]?.ToString() == "SuperAdmin" ? "selected" : "")>SuperAdmin</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select name="tier" class="form-select">
+                            <option value="">All Tiers</option>
+                            <option value="Bronze" @@(ViewData["Tier"]?.ToString() == "Bronze" ? "selected" : "")>Bronze</option>
+                            <option value="Silver" @@(ViewData["Tier"]?.ToString() == "Silver" ? "selected" : "")>Silver</option>
+                            <option value="Gold" @@(ViewData["Tier"]?.ToString() == "Gold" ? "selected" : "")>Gold</option>
+                            <option value="Platinum" @@(ViewData["Tier"]?.ToString() == "Platinum" ? "selected" : "")>Platinum</option>
+                            <option value="Diamond" @@(ViewData["Tier"]?.ToString() == "Diamond" ? "selected" : "")>Diamond</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select name="status" class="form-select">
+                            <option value="">All Status</option>
+                            <option value="true" @@(ViewData["Status"]?.ToString() == "true" ? "selected" : "")>Active</option>
+                            <option value="false" @@(ViewData["Status"]?.ToString() == "false" ? "selected" : "")>Inactive</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary flex-grow-1">
+                                <i class="fas fa-filter me-2"></i>Apply Filters
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Users Grid -->
+        @if (Model.Users.Any())
+        {
+            <div class="users-grid">
+                @foreach (var user in Model.Users)
+                {
+                    <div class="user-card">
+                        <!-- User Header -->
+                        <div class="user-header">
+                            <div class="avatar">
+                                @{
+                                    if (!string.IsNullOrEmpty(user.ProfilePictureUrl))
+                                    {
+                                        <img src="@user.ProfilePictureUrl" alt="@(user.FullName ?? "User")" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">
+                                    }
+                                    else
+                                    {
+                                        var name = user.FullName ?? user.Email ?? "User";
+                                        var initial = !string.IsNullOrWhiteSpace(name) ? name.Trim()[0].ToString().ToUpper() : "U";
+                                        @initial
+                                    }
+                                }
+                            </div>
+                            <div class="user-info">
+                                <div class="user-name" title="@user.FullName">@user.FullName</div>
+                                <div class="user-email" title="@user.Email">@user.Email</div>
+                            </div>
+                        </div>
+
+                        <!-- Stats -->
+                        <div class="user-stats">
+                            <div class="stat">
+                                <span class="stat-value">@user.TotalPurchases</span>
+                                <span class="stat-label">Orders</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">@user.LoyaltyPoints</span>
+                                <span class="stat-label">Points</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">AUD @user.TotalSpent.ToString("N0")</span>
+                                <span class="stat-label">Spent</span>
+                            </div>
+                        </div>
+
+                        <!-- Meta Info -->
+                        <div class="user-meta">
+                            @if (!string.IsNullOrEmpty(user.PhoneNumber))
+                            {
+                                <div class="meta-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span>@user.PhoneNumber</span>
+                                </div>
+                            }
+                            <div class="meta-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>Joined @user.CreatedAt.ToString("MMM dd, yyyy")</span>
+                            </div>
+                            @if (user.LastLoginAt.HasValue)
+                            {
+                                <div class="meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>Last login @user.LastLoginAt.Value.ToString("MMM dd, yyyy")</span>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Badges -->
+                        <div class="user-badges">
+                            <span class="badge tier-@user.MembershipTier.ToLower()">
+                                <i class="fas fa-crown me-1"></i>@user.MembershipTier
+                            </span>
+                            <span class="badge bg-@(user.Role == "SuperAdmin" ? "danger" : user.Role == "Admin" ? "warning" : user.Role == "Manager" ? "info" : user.Role == "Vendor" ? "primary" : "secondary")">
+                                @user.Role
+                            </span>
+                            <span class="badge bg-@(user.IsActive ? "success" : "danger")">
+                                @(user.IsActive ? "Active" : "Inactive")
+                            </span>
+                            @if (user.ReviewCount > 0)
+                            {
+                                <span class="badge bg-info">
+                                    <i class="fas fa-star me-1"></i>@user.ReviewCount Reviews
+                                </span>
+                            }
+                            @if (user.ComplaintCount > 0)
+                            {
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>@user.ComplaintCount Complaints
+                                </span>
+                            }
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="user-actions">
+                            <a asp-action="Details" asp-route-id="@user.Id" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye me-1"></i>View Details
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-edit me-1"></i>Edit User
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fas fa-users"></i>
+                <h3>No Users Found</h3>
+                <p>No users match your current filters, or no users have been created yet.</p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <a asp-action="Create" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Create First User
+                    </a>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-2"></i>Clear Filters
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-submit form on filter change
+        document.querySelectorAll('select[name="role"], select[name="tier"], select[name="status"]').forEach(select => {
+            select.addEventListener('change', function() {
+                this.closest('form').submit();
+            });
+        });
+
+        // Debounce search input
+        let searchTimeout;
+        const searchInput = document.querySelector('input[name="searchTerm"]');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    this.closest('form').submit();
+                }, 500);
+            });
+        }
+    </script>
+}

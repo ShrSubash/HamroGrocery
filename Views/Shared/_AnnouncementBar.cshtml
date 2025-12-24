@@ -1,0 +1,152 @@
+﻿@using Microsoft.EntityFrameworkCore
+@using HamroGrocery.Models.Entities
+@inject HamroGrocery.Data.ApplicationDbContext _context
+
+@{
+    var now = DateTime.UtcNow;
+    var announcements = await _context.Announcements
+        .Where(a => a.IsActive && !a.IsDeleted
+            && a.StartDate <= now
+            && (!a.EndDate.HasValue || a.EndDate.Value >= now)
+            && a.Location == AnnouncementLocation.AllPages)
+        .OrderByDescending(a => a.Priority)
+        .ThenByDescending(a => a.CreatedAt)
+        .Take(3)
+        .ToListAsync();
+}
+
+@if (announcements.Any())
+{
+    <style>
+        .announcement-bar {
+            position: relative;
+            z-index: 1040;
+        }
+
+        .announcement-item {
+            padding: 12px 20px;
+            text-align: center;
+            font-weight: 500;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            animation: slideDown 0.5s ease;
+        }
+
+            .announcement-item.info {
+                background: linear-gradient(135deg, #3498db, #2980b9);
+                color: white;
+            }
+
+            .announcement-item.warning {
+                background: linear-gradient(135deg, #f39c12, #e67e22);
+                color: white;
+            }
+
+            .announcement-item.success {
+                background: linear-gradient(135deg, #27ae60, #2ecc71);
+                color: white;
+            }
+
+            .announcement-item.error {
+                background: linear-gradient(135deg, #e74c3c, #c0392b);
+                color: white;
+            }
+
+        .announcement-close {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .announcement-close:hover {
+                background: rgba(255, 255, 255, 0.3);
+                transform: translateY(-50%) scale(1.1);
+            }
+
+        @@keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-100%);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes slideUp {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateY(-100%);
+            }
+        }
+    </style>
+
+    <div class="announcement-bar">
+        @foreach (var announcement in announcements)
+        {
+            <div class="announcement-item @announcement.Type.ToString().ToLower()" id="announcement-@announcement.Id">
+                <div class="container position-relative">
+                    <i class="@GetAnnouncementIcon(announcement.Type) me-2"></i>
+                    <strong>@announcement.Title:</strong> @announcement.Message
+                    <button class="announcement-close" onclick="dismissAnnouncement(@announcement.Id)">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+
+    <script>
+        function dismissAnnouncement(id) {
+            const element = document.getElementById(`announcement-${id}`);
+            if (element) {
+                element.style.animation = 'slideUp 0.5s ease';
+                setTimeout(() => element.remove(), 500);
+
+                // Store dismissed announcements in sessionStorage
+                let dismissed = JSON.parse(sessionStorage.getItem('dismissedAnnouncements') || '[]');
+                dismissed.push(id);
+                sessionStorage.setItem('dismissedAnnouncements', JSON.stringify(dismissed));
+            }
+        }
+
+        // Hide previously dismissed announcements
+        document.addEventListener('DOMContentLoaded', function () {
+            let dismissed = JSON.parse(sessionStorage.getItem('dismissedAnnouncements') || '[]');
+            dismissed.forEach(id => {
+                const element = document.getElementById(`announcement-${id}`);
+                if (element) element.style.display = 'none';
+            });
+        });
+    </script>
+}
+
+@functions {
+    string GetAnnouncementIcon(AnnouncementType type)
+    {
+        return type switch
+        {
+            AnnouncementType.Info => "fas fa-info-circle",
+            AnnouncementType.Warning => "fas fa-exclamation-triangle",
+            AnnouncementType.Success => "fas fa-check-circle",
+            AnnouncementType.Error => "fas fa-times-circle",
+            _ => "fas fa-bell"
+        };
+    }
+}

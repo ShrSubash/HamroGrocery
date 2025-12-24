@@ -1,0 +1,712 @@
+﻿@model HamroGrocery.Areas.Admin.Models.ViewModels.StockMovementsViewModel
+@{
+    ViewData["Title"] = "Stock Movements History";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    :root {
+        --primary: #10b981;
+        --primary-dark: #059669;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-900: #111827;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #3b82f6;
+        --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    .modern-movements {
+        padding: 24px;
+        background: var(--gray-50);
+    }
+
+    /* Page Header */
+    .page-header {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin: 0 0 8px 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .page-title i {
+        color: var(--primary);
+    }
+
+    .page-subtitle {
+        color: var(--gray-600);
+        font-size: 14px;
+        margin: 0;
+    }
+
+    /* Filter Section */
+    .filter-section {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+    }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .form-group {
+        margin: 0;
+    }
+
+    .form-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--gray-700);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1.5px solid var(--gray-200);
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: 12px;
+        align-items: flex-end;
+    }
+
+    /* Content Card */
+    .content-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+    }
+
+    .card-header-modern {
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--gray-200);
+        background: var(--gray-50);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .card-header-modern h4 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--gray-900);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .card-header-modern h4 i {
+        color: var(--primary);
+    }
+
+    /* Timeline Table */
+    .movements-table {
+        width: 100%;
+        margin: 0;
+    }
+
+    .movements-table thead th {
+        background: var(--gray-50);
+        color: var(--gray-700);
+        border: none;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 14px 16px;
+        border-bottom: 2px solid var(--gray-200);
+    }
+
+    .movements-table tbody tr {
+        border-bottom: 1px solid var(--gray-100);
+        transition: all 0.2s;
+    }
+
+    .movements-table tbody tr:hover {
+        background: var(--gray-50);
+    }
+
+    .movements-table tbody tr.stock-in {
+        border-left: 3px solid var(--success);
+    }
+
+    .movements-table tbody tr.stock-out {
+        border-left: 3px solid var(--danger);
+    }
+
+    .movements-table tbody tr.adjustment {
+        border-left: 3px solid var(--warning);
+    }
+
+    .movements-table tbody td {
+        padding: 16px;
+        vertical-align: middle;
+    }
+
+    /* Movement Type Badge */
+    .movement-type {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .movement-type.stock-in {
+        background: rgba(16, 185, 129, 0.1);
+        color: #047857;
+    }
+
+    .movement-type.stock-out {
+        background: rgba(239, 68, 68, 0.1);
+        color: #dc2626;
+    }
+
+    .movement-type.adjustment {
+        background: rgba(245, 158, 11, 0.1);
+        color: #d97706;
+    }
+
+    /* Product Info */
+    .product-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .product-name {
+        font-weight: 600;
+        color: var(--gray-900);
+        font-size: 14px;
+    }
+
+    .variation-name {
+        color: var(--gray-600);
+        font-size: 13px;
+    }
+
+    /* Quantity Display */
+    .quantity-change {
+        font-size: 18px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .quantity-change.positive {
+        color: var(--success);
+    }
+
+    .quantity-change.negative {
+        color: var(--danger);
+    }
+
+    .quantity-details {
+        font-size: 12px;
+        color: var(--gray-600);
+        margin-top: 4px;
+    }
+
+    /* Reason Cell */
+    .reason-text {
+        color: var(--gray-700);
+        font-size: 13px;
+        max-width: 300px;
+    }
+
+    /* User Info */
+    .user-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .user-name {
+        font-weight: 600;
+        color: var(--gray-900);
+        font-size: 13px;
+    }
+
+    .timestamp {
+        color: var(--gray-600);
+        font-size: 12px;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        color: white;
+    }
+
+    .btn-secondary {
+        background: transparent;
+        color: var(--gray-600);
+        border: 1.5px solid var(--gray-200);
+    }
+
+    .btn-secondary:hover {
+        border-color: var(--gray-600);
+        color: var(--gray-700);
+        background: var(--gray-50);
+    }
+
+    .btn-outline-primary {
+        background: transparent;
+        color: var(--primary);
+        border: 1.5px solid var(--primary);
+    }
+
+    .btn-outline-primary:hover {
+        background: var(--primary);
+        color: white;
+    }
+
+    /* Pagination */
+    .pagination-container {
+        padding: 20px 24px;
+        border-top: 1px solid var(--gray-200);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .pagination {
+        display: flex;
+        gap: 6px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .page-item .page-link {
+        border: 1.5px solid var(--gray-200);
+        color: var(--gray-700);
+        padding: 8px 14px;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .page-item .page-link:hover {
+        background: rgba(16, 185, 129, 0.05);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .page-item.active .page-link {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: white;
+    }
+
+    .page-item.disabled .page-link {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 80px 24px;
+    }
+
+    .empty-icon {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 24px;
+        background: rgba(16, 185, 129, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        color: var(--primary);
+    }
+
+    .empty-state h3 {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--gray-900);
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        color: var(--gray-600);
+        margin-bottom: 24px;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .modern-movements {
+            padding: 16px;
+        }
+
+        .filter-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-actions {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .filter-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .movements-table {
+            font-size: 13px;
+        }
+
+        .movements-table thead th,
+        .movements-table tbody td {
+            padding: 12px 10px;
+        }
+    }
+
+    /* Animations */
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-in {
+        animation: fadeIn 0.4s ease-out;
+    }
+</style>
+
+<div class="modern-movements">
+    <!-- Page Header -->
+    <div class="page-header animate-in">
+        <div class="header-content">
+            <div>
+                <h1 class="page-title">
+                    <i class="fas fa-exchange-alt"></i>
+                    Stock Movements History
+                </h1>
+                <p class="page-subtitle">Complete audit trail of all inventory changes and adjustments</p>
+            </div>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                Back to Inventory
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section animate-in" style="animation-delay: 0.1s;">
+        <form asp-action="StockMovements" method="get">
+            <div class="filter-grid">
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-calendar-alt"></i> Start Date
+                    </label>
+                    <input type="date" 
+                           name="startDate" 
+                           class="form-control" 
+                           value="@Model.StartDate?.ToString("yyyy-MM-dd")" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-calendar-check"></i> End Date
+                    </label>
+                    <input type="date" 
+                           name="endDate" 
+                           class="form-control" 
+                           value="@Model.EndDate?.ToString("yyyy-MM-dd")" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-box"></i> Product Filter
+                    </label>
+                    <select name="productVariationId" class="form-control">
+                        <option value="">All Products</option>
+                        @* Add product options here if needed *@
+                    </select>
+                </div>
+
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter"></i>
+                        Apply Filters
+                    </button>
+                    <a asp-action="StockMovements" class="btn btn-secondary">
+                        <i class="fas fa-redo"></i>
+                        Reset
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Movements Table -->
+    <div class="content-card animate-in" style="animation-delay: 0.2s;">
+        <div class="card-header-modern">
+            <h4>
+                <i class="fas fa-history"></i>
+                Movement Records
+            </h4>
+            <div>
+                <span style="background: var(--gray-100); color: var(--gray-700); padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 13px;">
+                    @Model.TotalItems Records
+                </span>
+            </div>
+        </div>
+
+        @if (Model.Movements != null && Model.Movements.Any())
+        {
+            <div class="table-responsive">
+                <table class="movements-table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Product</th>
+                            <th>Quantity Change</th>
+                            <th>Before → After</th>
+                            <th>Reason</th>
+                            <th>Date & User</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var movement in Model.Movements)
+                        {
+                            var rowClass = movement.MovementType == StockMovementType.StockIn ? "stock-in" :
+                                         movement.MovementType == StockMovementType.StockOut ? "stock-out" : "adjustment";
+
+                            var typeClass = movement.MovementType == StockMovementType.StockIn ? "stock-in" :
+                                          movement.MovementType == StockMovementType.StockOut ? "stock-out" : "adjustment";
+
+                            var quantityClass = movement.MovementType == StockMovementType.StockIn ? "positive" : "negative";
+                            var quantityPrefix = movement.MovementType == StockMovementType.StockIn ? "+" : "-";
+
+                            <tr class="@rowClass">
+                                <td>
+                                    <span class="movement-type @typeClass">
+                                        @if (movement.MovementType == StockMovementType.StockIn)
+                                        {
+                                            <i class="fas fa-arrow-up"></i>
+                                            <span>Stock In</span>
+                                        }
+                                        else if (movement.MovementType == StockMovementType.StockOut)
+                                        {
+                                            <i class="fas fa-arrow-down"></i>
+                                            <span>Stock Out</span>
+                                        }
+                                        else
+                                        {
+                                            <i class="fas fa-edit"></i>
+                                            <span>Adjustment</span>
+                                        }
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="product-info">
+                                        <div class="product-name">@movement.ProductVariation.Product.ProductName</div>
+                                        <div class="variation-name">@movement.ProductVariation.VariationName</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="quantity-change @quantityClass">
+                                        <span>@quantityPrefix@movement.Quantity</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="quantity-details">
+                                        <strong>@movement.PreviousQuantity</strong>
+                                        <i class="fas fa-arrow-right" style="color: var(--gray-600); margin: 0 4px;"></i>
+                                        <strong style="color: var(--primary);">@movement.NewQuantity</strong>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="reason-text">
+                                        @if (!string.IsNullOrEmpty(movement.Reason))
+                                        {
+                                            @movement.Reason
+                                        }
+                                        else
+                                        {
+                                            <span style="color: var(--gray-600); font-style: italic;">No reason provided</span>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="user-info">
+                                        <div class="timestamp">
+                                            <i class="fas fa-clock"></i>
+                                            @movement.CreatedAt.ToString("MMM dd, yyyy hh:mm tt")
+                                        </div>
+                                        <div class="user-name">
+                                            <i class="fas fa-user"></i>
+                                            @(movement.CreatedBy ?? "System")
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+                <div class="pagination-container">
+                    <div style="color: var(--gray-600); font-size: 14px;">
+                        Showing @((Model.CurrentPage - 1) * Model.PageSize + 1) to @Math.Min(Model.CurrentPage * Model.PageSize, Model.TotalItems) of @Model.TotalItems records
+                    </div>
+                    <nav>
+                        <ul class="pagination">
+                            <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                                <a class="page-link" href="@Url.Action("StockMovements", new { 
+                                    productVariationId = Model.ProductVariationId, 
+                                    startDate = Model.StartDate?.ToString("yyyy-MM-dd"), 
+                                    endDate = Model.EndDate?.ToString("yyyy-MM-dd"), 
+                                    pageNumber = Model.CurrentPage - 1 
+                                })">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+
+                            @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
+                            {
+                                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                    <a class="page-link" href="@Url.Action("StockMovements", new { 
+                                        productVariationId = Model.ProductVariationId, 
+                                        startDate = Model.StartDate?.ToString("yyyy-MM-dd"), 
+                                        endDate = Model.EndDate?.ToString("yyyy-MM-dd"), 
+                                        pageNumber = i 
+                                    })">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+
+                            <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                                <a class="page-link" href="@Url.Action("StockMovements", new { 
+                                    productVariationId = Model.ProductVariationId, 
+                                    startDate = Model.StartDate?.ToString("yyyy-MM-dd"), 
+                                    endDate = Model.EndDate?.ToString("yyyy-MM-dd"), 
+                                    pageNumber = Model.CurrentPage + 1 
+                                })">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h3>No Stock Movements Found</h3>
+                <p>
+                    @if (Model.StartDate.HasValue || Model.EndDate.HasValue || Model.ProductVariationId.HasValue)
+                    {
+                        <span>No movements match your filter criteria. Try adjusting the filters.</span>
+                    }
+                    else
+                    {
+                        <span>There are no stock movements recorded yet.</span>
+                    }
+                </p>
+                <a asp-action="Index" class="btn btn-primary">
+                    <i class="fas fa-warehouse"></i>
+                    Go to Inventory
+                </a>
+            </div>
+        }
+    </div>
+</div>

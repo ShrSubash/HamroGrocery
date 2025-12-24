@@ -1,0 +1,647 @@
+﻿@model HamroGrocery.Models.ViewModels.CheckoutViewModel
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+@section Styles {
+    <style>
+        .checkout-container {
+            padding: 60px 0;
+            background: #f8f9fa;
+            min-height: 80vh;
+        }
+
+        .checkout-card {
+            background: white;
+            border-radius: 16px;
+            padding: 35px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #e74c3c;
+        }
+
+        /* Delivery Method Selection */
+        .delivery-option {
+            border: 3px solid #e9ecef;
+            border-radius: 12px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+            .delivery-option:hover {
+                border-color: #e74c3c;
+                transform: translateY(-3px);
+                box-shadow: 0 8px 20px rgba(231,76,60,0.15);
+            }
+
+            .delivery-option.active {
+                border-color: #e74c3c;
+                background: rgba(231,76,60,0.05);
+            }
+
+            .delivery-option input[type="radio"] {
+                position: absolute;
+                opacity: 0;
+            }
+
+        .delivery-icon {
+            font-size: 2.5rem;
+            color: #e74c3c;
+            margin-bottom: 15px;
+        }
+
+        /* Payment Method Cards */
+        .payment-option {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+        }
+
+            .payment-option:hover {
+                border-color: #e74c3c;
+                transform: scale(1.03);
+            }
+
+            .payment-option.active {
+                border-color: #e74c3c;
+                background: rgba(231,76,60,0.05);
+            }
+
+            .payment-option input[type="radio"] {
+                position: absolute;
+                opacity: 0;
+            }
+
+        /* Modal Styles */
+        .modal-content {
+            border-radius: 16px;
+            border: none;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border-radius: 16px 16px 0 0;
+            padding: 20px 30px;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+
+            .form-control:focus {
+                border-color: #e74c3c;
+                box-shadow: 0 0 0 0.2rem rgba(231,76,60,0.25);
+            }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(231,76,60,0.3);
+            }
+
+        /* Order Summary */
+        .order-summary {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            position: sticky;
+            top: 90px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .summary-total {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #e74c3c;
+            padding-top: 15px;
+        }
+
+        .shipping-calculator {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .badge-cod {
+            background: #f39c12;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin-left: 8px;
+        }
+    </style>
+}
+
+<div class="container checkout-container">
+    <div class="row">
+        <!-- Main Checkout Form -->
+        <div class="col-lg-8">
+            <!-- Step 1: Delivery Method -->
+            <div class="checkout-card">
+                <h3 class="section-title">
+                    <i class="fas fa-shipping-fast me-2"></i>1. Delivery Method
+                </h3>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="delivery-option" id="delivery-option" onclick="selectDeliveryMethod('delivery')">
+                            <input type="radio" name="deliveryMethod" value="delivery" checked>
+                            <div class="text-center">
+                                <div class="delivery-icon">
+                                    <i class="fas fa-truck"></i>
+                                </div>
+                                <h5 class="fw-bold mb-2">Home Delivery</h5>
+                                <p class="text-muted mb-0">Get it delivered to your doorstep</p>
+                                <small class="text-success fw-bold">FREE over $2000</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="delivery-option" id="pickup-option" onclick="selectDeliveryMethod('pickup')">
+                            <input type="radio" name="deliveryMethod" value="pickup">
+                            <div class="text-center">
+                                <div class="delivery-icon">
+                                    <i class="fas fa-store"></i>
+                                </div>
+                                <h5 class="fw-bold mb-2">Store Pickup</h5>
+                                <p class="text-muted mb-1">Pick up from our store</p>
+                                <small class="text-info">@Model.PickupStoreAddress</small><br>
+                                <small class="text-success fw-bold">Ready in 2 hours</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delivery Address Section (shown when delivery is selected) -->
+                <div id="delivery-address-section" style="display:none;">
+                    <hr class="my-4">
+                    <h5 class="mb-3"><i class="fas fa-map-marker-alt me-2 text-danger"></i>Delivery Address</h5>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Full Name *</label>
+                            <input type="text" class="form-control" id="fullName" placeholder="John Doe" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Phone Number *</label>
+                            <input type="tel" class="form-control" id="phone" placeholder="04XX XXX XXX" required>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">Email</label>
+                            <input type="email" class="form-control" id="email" placeholder="your@email.com">
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">Street Address *</label>
+                            <input type="text" class="form-control" id="streetAddress" placeholder="123 Main Street" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Suburb</label>
+                            <input type="text" class="form-control" id="suburb" placeholder="Suburb">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">City *</label>
+                            <input type="text" class="form-control" id="city" placeholder="Sydney" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">State *</label>
+                            <select class="form-control" id="state" required>
+                                <option value="">Select State</option>
+                                <option value="NSW" selected>NSW</option>
+                                <option value="VIC">VIC</option>
+                                <option value="QLD">QLD</option>
+                                <option value="SA">SA</option>
+                                <option value="WA">WA</option>
+                                <option value="TAS">TAS</option>
+                                <option value="ACT">ACT</option>
+                                <option value="NT">NT</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Postcode *</label>
+                            <input type="text" class="form-control" id="postcode" placeholder="2000" maxlength="4" required>
+                            <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="calculateShipping()">
+                                <i class="fas fa-calculator me-1"></i>Calculate Shipping
+                            </button>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">Delivery Instructions</label>
+                            <textarea class="form-control" id="deliveryInstructions" rows="2" placeholder="Leave at door, call on arrival, etc."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Shipping Cost Display -->
+                    <div id="shipping-result" style="display:none;" class="shipping-calculator">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong><i class="fas fa-shipping-fast me-2"></i>Shipping Cost:</strong>
+                                <span id="shipping-cost-display" class="ms-2"></span>
+                            </div>
+                            <small id="shipping-estimate" class="text-muted"></small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pickup Details (shown when pickup is selected) -->
+                <div id="pickup-details-section" style="display:none;">
+                    <hr class="my-4">
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-info-circle me-2"></i>Pickup Information</h5>
+                        <p class="mb-1"><strong>Store:</strong> @Model.PickupStoreName</p>
+                        <p class="mb-1"><strong>Address:</strong> @Model.PickupStoreAddress</p>
+                        <p class="mb-1"><strong>Estimated Ready Time:</strong> @Model.EstimatedPickupTime?.ToString("dddd, dd MMM yyyy hh:mm tt")</p>
+                        <hr>
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Your Name *</label>
+                                <input type="text" class="form-control" id="pickup-name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Contact Phone *</label>
+                                <input type="tel" class="form-control" id="pickup-phone" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Payment Method -->
+            <div class="checkout-card">
+                <h3 class="section-title">
+                    <i class="fas fa-credit-card me-2"></i>2. Payment Method
+                </h3>
+
+                <div class="row g-3">
+                    <div class="col-md-3 col-6">
+                        <div class="payment-option active" id="card-option" onclick="selectPaymentMethod('card')">
+                            <input type="radio" name="paymentMethod" value="card" checked>
+                            <i class="fas fa-credit-card fa-2x text-primary mb-2"></i>
+                            <p class="mb-0 fw-bold">Credit Card</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="payment-option" id="paypal-option" onclick="selectPaymentMethod('paypal')">
+                            <input type="radio" name="paymentMethod" value="paypal">
+                            <i class="fab fa-paypal fa-2x text-info mb-2"></i>
+                            <p class="mb-0 fw-bold">PayPal</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="payment-option" id="afterpay-option" onclick="selectPaymentMethod('afterpay')">
+                            <input type="radio" name="paymentMethod" value="afterpay">
+                            <i class="fas fa-calendar-alt fa-2x text-success mb-2"></i>
+                            <p class="mb-0 fw-bold">Afterpay</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="payment-option" id="cod-option" onclick="selectPaymentMethod('cod')">
+                            <input type="radio" name="paymentMethod" value="cod">
+                            <i class="fas fa-money-bill-wave fa-2x text-warning mb-2"></i>
+                            <p class="mb-0 fw-bold">Cash on Delivery</p>
+                            <span class="badge-cod">+$15 fee</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="cod-notice" style="display:none;" class="alert alert-warning mt-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Note:</strong> A $15 service fee applies for Cash on Delivery. Payment must be made to the delivery driver.
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="col-lg-4">
+            <div class="order-summary">
+                <h4 class="mb-3"><i class="fas fa-shopping-bag me-2 text-danger"></i>Order Summary</h4>
+
+                <!-- Cart Items -->
+                <div class="mb-3">
+                    @foreach (var item in Model.Cart.Items)
+                    {
+                        <div class="d-flex justify-content-between mb-2">
+                            <small>@item.ProductName x @item.Quantity</small>
+                            <small class="fw-bold">$@item.TotalPrice.ToString("N2")</small>
+                        </div>
+                    }
+                </div>
+
+                <hr>
+
+                <div class="summary-row">
+                    <span>Subtotal (@Model.Cart.TotalItems items)</span>
+                    <strong>$@Model.Cart.SubTotal.ToString("N2")</strong>
+                </div>
+
+                <div class="summary-row">
+                    <span>Tax (13% VAT)</span>
+                    <strong>$@Model.Cart.TaxAmount.ToString("N2")</strong>
+                </div>
+
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <strong id="summary-shipping">Calculated at next step</strong>
+                </div>
+
+                <div class="summary-row" id="cod-fee-row" style="display:none;">
+                    <span>COD Service Fee</span>
+                    <strong class="text-warning">$15.00</strong>
+                </div>
+
+                <div class="summary-row summary-total">
+                    <span>Total</span>
+                    <span id="summary-total">$@Model.Cart.CartTotal.ToString("N2")</span>
+                </div>
+
+                <button class="btn btn-primary w-100 mt-3" onclick="proceedToPayment()">
+                    <i class="fas fa-lock me-2"></i>Place Order
+                </button>
+
+                <div class="text-center mt-3">
+                    <small class="text-muted">
+                        <i class="fas fa-shield-alt me-1"></i>Secure Payment
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        const stripe = Stripe('@@(Configuration["Stripe:PublishableKey"])');
+        let selectedDeliveryMethod = 'delivery';
+        let selectedPaymentMethod = 'card';
+        let calculatedShipping = 0;
+        const cartSubtotal = @Model.Cart.SubTotal;
+
+        // Delivery Method Selection
+        function selectDeliveryMethod(method) {
+            selectedDeliveryMethod = method;
+
+            // Update UI
+            document.querySelectorAll('.delivery-option').forEach(el => el.classList.remove('active'));
+            document.getElementById(`${method}-option`).classList.add('active');
+
+            // Show/hide relevant sections
+            if (method === 'delivery') {
+                document.getElementById('delivery-address-section').style.display = 'block';
+                document.getElementById('pickup-details-section').style.display = 'none';
+                document.getElementById('cod-option').style.display = 'block';
+            } else {
+                document.getElementById('delivery-address-section').style.display = 'none';
+                document.getElementById('pickup-details-section').style.display = 'block';
+                document.getElementById('cod-option').style.display = 'none';
+                if (selectedPaymentMethod === 'cod') {
+                    selectPaymentMethod('card');
+                }
+                updateSummary(0);
+            }
+        }
+
+        // Payment Method Selection
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
+
+            document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('active'));
+            document.getElementById(`${method}-option`).classList.add('active');
+
+            // Show COD notice
+            document.getElementById('cod-notice').style.display = method === 'cod' ? 'block' : 'none';
+            document.getElementById('cod-fee-row').style.display = method === 'cod' ? 'flex' : 'none';
+
+            updateSummary(calculatedShipping);
+        }
+
+        // Calculate Shipping
+             // Calculate Shipping - DEBUG VERSION
+                async function calculateShipping() {
+            const postcode = document.getElementById('postcode').value;
+            const suburb = document.getElementById('suburb').value;
+
+            console.log('=== SHIPPING CALCULATION ===');
+            console.log('Postcode:', postcode);
+            console.log('Cart Subtotal:', cartSubtotal);
+
+            if (!postcode || postcode.length !== 4) {
+                showToast('error', 'Please enter a valid 4-digit postcode');
+                return;
+            }
+
+            try {
+                const response = await fetch('/Checkout/CalculateShipping', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    },
+                    body: JSON.stringify({
+                        postcode: postcode,
+                        suburb: suburb || 'Sydney',
+                        cartTotal: cartSubtotal
+                    })
+                });
+
+                console.log('Response Status:', response.status);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Response Data:', data);
+
+                // ✅ FIX: Use camelCase property names (lowercase first letter)
+                if (data.success) {
+                    calculatedShipping = data.standardShipping; // ✅ lowercase 's'
+
+                    document.getElementById('shipping-result').style.display = 'block';
+                    document.getElementById('shipping-cost-display').innerHTML =
+                        data.isFreeShippingEligible // ✅ lowercase 'i'
+                            ? '<strong class="text-success">FREE</strong>'
+                            : `<strong>$${data.standardShipping.toFixed(2)}</strong>`; // ✅ lowercase 's'
+
+                    document.getElementById('shipping-estimate').textContent =
+                        `Estimated delivery: ${data.estimatedDays} business days`; // ✅ lowercase 'e'
+
+                    updateSummary(calculatedShipping);
+                    showToast('success', data.message);
+                } else {
+                    showToast('error', data.message || 'Could not calculate shipping');
+                }
+            } catch (error) {
+                console.error('Shipping calculation error:', error);
+                showToast('error', `Error calculating shipping: ${error.message}`);
+            }
+        }
+        // Update Order Summary
+        function updateSummary(shippingCost) {
+            const subtotal = cartSubtotal;
+            const tax = @Model.Cart.TaxAmount;
+            const codFee = selectedPaymentMethod === 'cod' ? 15 : 0;
+            const total = subtotal + tax + shippingCost + codFee;
+
+            document.getElementById('summary-shipping').textContent =
+                shippingCost === 0 ? 'FREE' : `$${shippingCost.toFixed(2)}`;
+            document.getElementById('summary-total').textContent = `$${total.toFixed(2)}`;
+        }
+
+        // Proceed to Payment
+        async function proceedToPayment() {
+            try {
+                // Validate based on delivery method
+                if (selectedDeliveryMethod === 'delivery') {
+                    const fullName = document.getElementById('fullName').value.trim();
+                    const phone = document.getElementById('phone').value.trim();
+                    const streetAddress = document.getElementById('streetAddress').value.trim();
+                    const city = document.getElementById('city').value.trim();
+                    const state = document.getElementById('state').value;
+                    const postcode = document.getElementById('postcode').value.trim();
+
+                    if (!fullName || !phone || !streetAddress || !city || !state || !postcode) {
+                        showToast('error', 'Please fill all required delivery address fields');
+                        return;
+                    }
+
+                    if (postcode.length !== 4 || !/^\d{4}$/.test(postcode)) {
+                        showToast('error', 'Please enter a valid 4-digit postcode');
+                        return;
+                    }
+                } else {
+                    const pickupName = document.getElementById('pickup-name').value.trim();
+                    const pickupPhone = document.getElementById('pickup-phone').value.trim();
+
+                    if (!pickupName || !pickupPhone) {
+                        showToast('error', 'Please provide your contact details for pickup');
+                        return;
+                    }
+                }
+
+                // Build checkout data
+                const checkoutData = {
+                    deliveryMethod: selectedDeliveryMethod === 'delivery' ? 1 : 2,
+                    paymentMethod: getPaymentMethodEnum(selectedPaymentMethod),
+                    fullName: selectedDeliveryMethod === 'delivery'
+                        ? document.getElementById('fullName').value
+                        : document.getElementById('pickup-name').value,
+                    phone: selectedDeliveryMethod === 'delivery'
+                        ? document.getElementById('phone').value
+                        : document.getElementById('pickup-phone').value,
+                    email: document.getElementById('email')?.value || '',
+                    streetAddress: document.getElementById('streetAddress')?.value || '',
+                    suburb: document.getElementById('suburb')?.value || '',
+                    city: document.getElementById('city')?.value || '',
+                    state: document.getElementById('state')?.value || '',
+                    postcode: document.getElementById('postcode')?.value || '',
+                    deliveryInstructions: document.getElementById('deliveryInstructions')?.value || ''
+                };
+
+                const response = await fetch('/checkout/process', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    },
+                    body: JSON.stringify(checkoutData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    if (result.paymentMethod === 'cod') {
+                        // Redirect to order confirmation for COD
+                        window.location.href = result.redirectUrl;
+                    } else {
+                        // Redirect to Stripe for online payment
+                        await stripe.redirectToCheckout({ sessionId: result.sessionId });
+                    }
+                } else {
+                    showToast('error', result.message);
+                }
+            } catch (error) {
+                console.error('Checkout error:', error);
+                showToast('error', 'Error processing checkout. Please try again.');
+            }
+        }
+
+        function getPaymentMethodEnum(method) {
+            const map = { 'card': 1, 'paypal': 2, 'afterpay': 3, 'cod': 4 };
+            return map[method] || 1;
+        }
+
+        // Toast Notification
+        function showToast(type, message) {
+            const bg = type === 'success' ? '#27ae60' : '#e74c3c';
+            const icon = type === 'success' ? 'check-circle' : 'exclamation-circle';
+
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed; top: 90px; right: 20px; background: ${bg}; color: white;
+                padding: 15px 25px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+                z-index: 9999; animation: slideIn 0.4s ease;
+            `;
+            toast.innerHTML = `<i class="fas fa-${icon} me-2"></i>${message}`;
+
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            selectDeliveryMethod('delivery');
+
+            // Auto-calculate shipping on postcode change
+            document.getElementById('postcode')?.addEventListener('blur', function() {
+                if (this.value.length === 4) {
+                    calculateShipping();
+                }
+            });
+        });
+
+        // Animation
+        const style = document.createElement('style');
+        style.textContent = '@@keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }';
+        document.head.appendChild(style);
+    </script>
+}

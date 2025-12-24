@@ -1,0 +1,290 @@
+﻿@model HamroGrocery.Models.Cart
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<style>
+    .checkout-choice-container {
+        min-height: calc(100vh - 140px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 40px 20px;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .checkout-choice-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(231, 76, 60, 0.8) 0%, rgba(192, 57, 43, 0.6) 100%);
+            opacity: 0.9;
+        }
+
+    .choice-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 24px;
+        padding: 40px;
+        max-width: 900px;
+        width: 100%;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        position: relative;
+        z-index: 2;
+    }
+
+    .choice-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+        .choice-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .choice-header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+
+    .cart-summary {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    .cart-summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 1rem;
+    }
+
+        .cart-summary-row:last-child {
+            margin-bottom: 0;
+            padding-top: 10px;
+            border-top: 2px solid #dee2e6;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+    .choices-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-top: 30px;
+    }
+
+    .choice-option {
+        background: white;
+        border: 3px solid #e9ecef;
+        border-radius: 16px;
+        padding: 30px;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+    }
+
+        .choice-option:hover {
+            border-color: #e74c3c;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.2);
+        }
+
+    .choice-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+    }
+
+    .choice-option.guest .choice-icon {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+    }
+
+    .choice-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 15px;
+    }
+
+    .choice-description {
+        color: #7f8c8d;
+        margin-bottom: 20px;
+        line-height: 1.6;
+    }
+
+    .choice-benefits {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 20px;
+        text-align: left;
+    }
+
+        .choice-benefits li {
+            padding: 8px 0;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .choice-benefits li i {
+                color: #27ae60;
+                font-size: 1.2rem;
+            }
+
+    .choice-btn {
+        width: 100%;
+        padding: 15px 30px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+        .choice-btn.login {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+            .choice-btn.login:hover {
+                background: linear-gradient(135deg, #c0392b, #a93226);
+                transform: scale(1.02);
+                color: white;
+                text-decoration: none;
+            }
+
+        .choice-btn.guest {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+            .choice-btn.guest:hover {
+                background: linear-gradient(135deg, #2980b9, #21618c);
+                transform: scale(1.02);
+                color: white;
+                text-decoration: none;
+            }
+
+    @@media (max-width: 768px) {
+        .choices-container {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .choice-card {
+            padding: 30px 20px;
+        }
+
+        .choice-header h1 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+
+<div class="checkout-choice-container">
+    <div class="choice-card">
+        <div class="choice-header">
+            <h1><i class="fas fa-shopping-cart me-2"></i>Ready to Checkout?</h1>
+            <p>Choose how you'd like to complete your purchase</p>
+        </div>
+
+        <!-- Cart Summary -->
+        <div class="cart-summary">
+            <div class="cart-summary-row">
+                <span>Items in Cart:</span>
+                <strong>@Model.TotalItems items</strong>
+            </div>
+            <div class="cart-summary-row">
+                <span>Subtotal:</span>
+                <strong>AUD @Model.SubTotal.ToString("N2")</strong>
+            </div>
+        </div>
+
+        <!-- Checkout Options -->
+        <div class="choices-container">
+            <!-- Login Option -->
+            <div class="choice-option">
+                <div class="choice-icon">
+                    <i class="fas fa-user-lock"></i>
+                </div>
+                <h3 class="choice-title">Login to Your Account</h3>
+                <p class="choice-description">Sign in to access saved addresses, order history, and faster checkout.</p>
+
+                <ul class="choice-benefits">
+                    <li><i class="fas fa-check-circle"></i> Track your orders</li>
+                    <li><i class="fas fa-check-circle"></i> Save delivery addresses</li>
+                    <li><i class="fas fa-check-circle"></i> View order history</li>
+                    <li><i class="fas fa-check-circle"></i> Exclusive member offers</li>
+                </ul>
+
+                <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Url.Action("Index", "Checkout")"
+                   class="choice-btn login">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login & Continue
+                </a>
+
+                <p class="text-center mt-3 mb-0">
+                    <small class="text-muted">
+                        Don't have an account?
+                        <a asp-area="Identity" asp-page="/Account/Register" asp-route-returnUrl="@Url.Action("Index", "Checkout")"
+                           style="color: #e74c3c; font-weight: 600;">Register now</a>
+                    </small>
+                </p>
+            </div>
+
+            <!-- Guest Checkout Option -->
+            <div class="choice-option guest">
+                <div class="choice-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h3 class="choice-title">Continue as Guest</h3>
+                <p class="choice-description">Checkout quickly without creating an account. Perfect for one-time purchases.</p>
+
+                <ul class="choice-benefits">
+                    <li><i class="fas fa-check-circle"></i> Quick checkout</li>
+                    <li><i class="fas fa-check-circle"></i> No registration needed</li>
+                    <li><i class="fas fa-check-circle"></i> Safe & secure</li>
+                    <li><i class="fas fa-check-circle"></i> Track order via email</li>
+                </ul>
+
+                <a asp-action="GuestCheckout" asp-controller="Cart" class="choice-btn guest">
+                    <i class="fas fa-shopping-bag me-2"></i>Continue as Guest
+                </a>
+
+                <p class="text-center mt-3 mb-0">
+                    <small class="text-muted">
+                        You can create an account after your purchase
+                    </small>
+                </p>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a asp-action="Index" asp-controller="Cart" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Cart
+            </a>
+        </div>
+    </div>
+</div>

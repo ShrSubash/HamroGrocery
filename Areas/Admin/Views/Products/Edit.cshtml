@@ -1,0 +1,798 @@
+﻿@model HamroGrocery.Models.ViewModels.CreateProductDetailedViewModel
+@{
+    ViewData["Title"] = "Edit Product";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var productId = ViewContext.RouteData.Values["id"];
+}
+
+<style>
+    /* Modern Color Scheme */
+    :root {
+        --primary-green: #008060;
+        --primary-dark: #005e46;
+        --border-light: #e1e3e5;
+        --text-primary: #202223;
+        --text-secondary: #6d7175;
+        --bg-surface: #ffffff;
+        --bg-hover: #f6f6f7;
+        --success: #008060;
+        --danger: #d82c0d;
+        --warning: #ffb800;
+    }
+
+    /* Page Header */
+    .page-header {
+        background: var(--bg-surface);
+        border-radius: 12px;
+        padding: 24px 32px;
+        margin-bottom: 24px;
+        border: 1px solid var(--border-light);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .page-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-header i {
+            color: var(--warning);
+            font-size: 28px;
+        }
+
+    /* Info Banner */
+    .info-banner {
+        background: rgba(255, 184, 0, 0.1);
+        border: 1px solid rgba(255, 184, 0, 0.3);
+        border-left: 4px solid var(--warning);
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+        .info-banner i {
+            color: var(--warning);
+            font-size: 20px;
+        }
+
+    .info-banner-content {
+        flex: 1;
+    }
+
+        .info-banner-content h6 {
+            margin: 0 0 4px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #996e00;
+        }
+
+        .info-banner-content p {
+            margin: 0;
+            font-size: 13px;
+            color: #996e00;
+        }
+
+    /* Form Card */
+    .form-card {
+        background: var(--bg-surface);
+        border-radius: 12px;
+        border: 1px solid var(--border-light);
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        animation: fadeIn 0.4s ease;
+    }
+
+    .card-header-custom {
+        padding: 20px 32px;
+        background: var(--bg-hover);
+        border-bottom: 1px solid var(--border-light);
+    }
+
+        .card-header-custom h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+    /* Section Dividers */
+    .section-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 32px 0 16px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid var(--border-light);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .section-title:first-of-type {
+            margin-top: 0;
+        }
+
+        .section-title i {
+            color: var(--primary-green);
+            font-size: 20px;
+        }
+
+    /* Form Controls */
+    .form-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-control,
+    .form-select {
+        border: 1.5px solid var(--border-light);
+        border-radius: 8px;
+        padding: 11px 14px;
+        font-size: 14px;
+        color: var(--text-primary);
+        transition: all 0.2s ease;
+        background: var(--bg-surface);
+    }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(0, 128, 96, 0.1);
+            outline: none;
+        }
+
+        .form-control::placeholder {
+            color: #b5b5b5;
+            font-size: 13px;
+        }
+
+    textarea.form-control {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    /* Image Upload Section */
+    .image-upload-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .current-image-preview {
+        border: 2px solid var(--border-light);
+        border-radius: 12px;
+        padding: 16px;
+        text-align: center;
+        background: var(--bg-hover);
+    }
+
+        .current-image-preview h6 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .current-image-preview img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+    .no-current-image {
+        padding: 40px;
+        color: var(--text-secondary);
+    }
+
+        .no-current-image i {
+            font-size: 48px;
+            opacity: 0.3;
+            margin-bottom: 8px;
+        }
+
+    .image-upload-area {
+        position: relative;
+        border: 2px dashed var(--border-light);
+        border-radius: 12px;
+        padding: 32px;
+        text-align: center;
+        background: var(--bg-hover);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+        .image-upload-area:hover {
+            border-color: var(--primary-green);
+            background: rgba(0, 128, 96, 0.03);
+        }
+
+        .image-upload-area.has-image {
+            border-style: solid;
+            border-color: var(--primary-green);
+            background: rgba(0, 128, 96, 0.05);
+        }
+
+    .upload-icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 16px;
+        background: var(--bg-surface);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        color: var(--primary-green);
+        border: 2px solid var(--border-light);
+    }
+
+    .upload-text {
+        font-size: 14px;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+    }
+
+    .upload-hint {
+        font-size: 12px;
+        color: #b5b5b5;
+    }
+
+    #productImageInput {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    #imagePreview {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 8px;
+        margin-top: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Modern Checkboxes */
+    .checkbox-group {
+        display: flex;
+        gap: 24px;
+        flex-wrap: wrap;
+    }
+
+    .modern-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        background: var(--bg-hover);
+        border: 1.5px solid var(--border-light);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+        .modern-checkbox:hover {
+            border-color: var(--primary-green);
+            background: rgba(0, 128, 96, 0.05);
+        }
+
+        .modern-checkbox input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary-green);
+        }
+
+        .modern-checkbox label {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+    /* Buttons */
+    .btn {
+        padding: 11px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: var(--primary-green);
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 128, 96, 0.3);
+            color: white;
+        }
+
+    .btn-secondary {
+        background: transparent;
+        color: var(--text-secondary);
+        border: 1.5px solid var(--border-light);
+    }
+
+        .btn-secondary:hover {
+            border-color: var(--text-secondary);
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+    /* Validation */
+    .alert-danger {
+        background: rgba(216, 44, 13, 0.1);
+        border: 1px solid rgba(216, 44, 13, 0.3);
+        border-left: 4px solid var(--danger);
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin-bottom: 24px;
+    }
+
+        .alert-danger h6 {
+            color: var(--danger);
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+    .text-danger {
+        color: var(--danger);
+        font-size: 12px;
+        margin-top: 4px;
+        display: block;
+    }
+
+    /* Form Footer */
+    .form-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border-light);
+    }
+
+    /* Input with Icon */
+    .input-with-icon {
+        position: relative;
+    }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        .input-with-icon .form-control {
+            padding-left: 42px;
+        }
+
+    /* Required Asterisk */
+    .form-label.required::after {
+        content: ' *';
+        color: var(--danger);
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .page-header
+
+    {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+    .image-upload-section {
+        grid-template-columns: 1fr;
+    }
+
+    .checkbox-group {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .form-footer {
+        flex-direction: column-reverse;
+        gap: 12px;
+    }
+
+        .form-footer .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+    }
+
+    /* Animation */
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+</style>
+
+<!-- Page Header -->
+<div class="page-header">
+    <h2>
+        <i class="fas fa-edit"></i>
+        Edit Product
+    </h2>
+    <a asp-area="Admin" asp-controller="Products" asp-action="Index" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i>
+        Back to Products
+    </a>
+</div>
+
+<!-- Info Banner -->
+<div class="info-banner">
+    <i class="fas fa-info-circle"></i>
+    <div class="info-banner-content">
+        <h6>Editing Product</h6>
+        <p>Update product information below. Changes will be saved immediately upon submission.</p>
+    </div>
+</div>
+
+<!-- Validation Summary -->
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert-danger">
+        <h6><i class="fas fa-exclamation-triangle me-2"></i>Please correct the following errors:</h6>
+        <div asp-validation-summary="All"></div>
+    </div>
+}
+
+<!-- Edit Product Form -->
+<div class="form-card">
+    <div class="card-header-custom">
+        <h4>
+            <i class="fas fa-pencil-alt"></i>
+            Product Information
+        </h4>
+    </div>
+
+    <div class="card-body" style="padding: 32px;">
+        <form asp-action="Edit" asp-route-id="@productId" method="post" enctype="multipart/form-data" novalidate>
+            @Html.AntiForgeryToken()
+
+            <!-- Basic Information -->
+            <div class="section-title">
+                <i class="fas fa-tag"></i>
+                Basic Information
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-8">
+                    <label asp-for="ProductName" class="form-label required">Product Name</label>
+                    <input asp-for="ProductName" class="form-control" placeholder="Enter product name" />
+                    <span asp-validation-for="ProductName" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="CategoryId" class="form-label required">Category</label>
+                    <select asp-for="CategoryId" class="form-select"
+                            asp-items="@(new SelectList(ViewBag.Categories, "Id", "CategoryName"))">
+                        <option value="">-- Select Category --</option>
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="Description" class="form-label">Product Description</label>
+                    <textarea asp-for="Description" class="form-control" rows="4" placeholder="Describe your product..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- Pricing & Stock -->
+            <div class="section-title">
+                <i class="fas fa-dollar-sign"></i>
+                Pricing & Inventory
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label asp-for="Price" class="form-label required">Selling Price (AUD)</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-rupee-sign"></i>
+                        <input asp-for="Price" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                    </div>
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="ComparePrice" class="form-label">Compare at Price</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-rupee-sign"></i>
+                        <input asp-for="ComparePrice" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                    </div>
+                    <span asp-validation-for="ComparePrice" class="text-danger"></span>
+                    <small class="text-muted">Original price before discount</small>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="StockQuantity" class="form-label required">Current Stock</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-boxes"></i>
+                        <input asp-for="StockQuantity" type="number" class="form-control" placeholder="0" />
+                    </div>
+                    <span asp-validation-for="StockQuantity" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="ReorderPoint" class="form-label required">Reorder Point</label>
+                    <input asp-for="ReorderPoint" type="number" class="form-control" placeholder="10" />
+                    <span asp-validation-for="ReorderPoint" class="text-danger"></span>
+                    <small class="text-muted">Alert when stock reaches this level</small>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="MaxStockLevel" class="form-label required">Maximum Stock</label>
+                    <input asp-for="MaxStockLevel" type="number" class="form-control" placeholder="500" />
+                    <span asp-validation-for="MaxStockLevel" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="Unit" class="form-label">Unit of Measure</label>
+                    <input asp-for="Unit" class="form-control" placeholder="pcs, kg, L, etc." />
+                    <span asp-validation-for="Unit" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- Physical Properties -->
+            <div class="section-title">
+                <i class="fas fa-weight"></i>
+                Physical Properties
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label asp-for="Weight" class="form-label">Weight (kg)</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-weight-hanging"></i>
+                        <input asp-for="Weight" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                    </div>
+                    <span asp-validation-for="Weight" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="SKU" class="form-label">SKU</label>
+                    <input asp-for="SKU" class="form-control" placeholder="Product SKU" />
+                    <span asp-validation-for="SKU" class="text-danger"></span>
+                    <small class="text-muted">Leave blank to auto-generate</small>
+                </div>
+            </div>
+
+            <!-- Product Image -->
+            <div class="section-title">
+                <i class="fas fa-image"></i>
+                Product Image
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-12">
+                    <div class="image-upload-section">
+                        <!-- Current Image Preview -->
+                        <div class="current-image-preview">
+                            <h6>Current Image</h6>
+                            @if (!string.IsNullOrEmpty(Model.CurrentImagePath))
+                            {
+                                <img src="@Model.CurrentImagePath" alt="Current product image" />
+                                <p style="font-size: 12px; color: var(--text-secondary); margin: 0;">
+                                    <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                                    Image uploaded
+                                </p>
+                            }
+                            else
+                            {
+                                <div class="no-current-image">
+                                    <i class="fas fa-image"></i>
+                                    <p style="font-size: 13px; margin: 0;">No image uploaded</p>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- New Image Upload -->
+                        <div>
+                            <h6 style="font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                Upload New Image
+                            </h6>
+                            <div class="image-upload-area" id="uploadArea">
+                                <input type="file" name="productImage" class="form-control" accept="image/*" id="productImageInput" />
+                                <div id="uploadPlaceholder">
+                                    <div class="upload-icon">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                    </div>
+                                    <div class="upload-text">
+                                        <strong>Click to upload</strong> or drag and drop
+                                    </div>
+                                    <div class="upload-hint">
+                                        PNG, JPG up to 5MB (will replace current image)
+                                    </div>
+                                </div>
+                                <img id="imagePreview" src="#" alt="Preview" style="display:none;" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Settings -->
+            <div class="section-title">
+                <i class="fas fa-cog"></i>
+                Product Settings
+            </div>
+
+            <div class="checkbox-group">
+                <div class="modern-checkbox">
+                    <input asp-for="IsActive" type="checkbox" id="isActive" />
+                    <label asp-for="IsActive" for="isActive">Active (Visible to customers)</label>
+                </div>
+
+                <div class="modern-checkbox">
+                    <input asp-for="IsFeatured" type="checkbox" id="isFeatured" />
+                    <label asp-for="IsFeatured" for="isFeatured">Featured Product</label>
+                </div>
+            </div>
+
+            <!-- Form Footer -->
+            <div class="form-footer">
+                <div style="display: flex; gap: 12px;">
+                    <a asp-area="Admin" asp-controller="Products" asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </a>
+
+                    <a asp-area="Admin" asp-controller="Products" asp-action="Details" asp-route-id="@productId" class="btn btn-secondary">
+                        <i class="fas fa-eye"></i>
+                        View Product
+                    </a>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Image preview functionality
+        const imageInput = document.getElementById('productImageInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+        const uploadArea = document.getElementById('uploadArea');
+
+        imageInput.addEventListener('change', function (event) {
+            const file = event.target.files[0];
+
+            if (file) {
+                // Validate file size (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size must be less than 5MB');
+                    imageInput.value = '';
+                    return;
+                }
+
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    alert('Please select an image file');
+                    imageInput.value = '';
+                    return;
+                }
+
+                // Read and display image
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                    uploadPlaceholder.style.display = 'none';
+                    uploadArea.classList.add('has-image');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.style.display = 'none';
+                uploadPlaceholder.style.display = 'block';
+                uploadArea.classList.remove('has-image');
+            }
+        });
+
+        // Drag and drop functionality
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'var(--primary-green)';
+            uploadArea.style.background = 'rgba(0, 128, 96, 0.05)';
+        });
+
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadArea.style.borderColor = '';
+            uploadArea.style.background = '';
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadArea.style.borderColor = '';
+            uploadArea.style.background = '';
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                imageInput.files = files;
+                imageInput.dispatchEvent(new Event('change'));
+            }
+        });
+
+        // Form validation enhancement
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+            const requiredFields = form.querySelectorAll('[required]');
+            let isValid = true;
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.classList.add('is-invalid');
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            });
+
+            if (!isValid) {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+    </script>
+}
