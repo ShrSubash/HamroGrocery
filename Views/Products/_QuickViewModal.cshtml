@@ -1,0 +1,138 @@
+﻿@model HamroGrocery.Models.ViewModels.ProductQuickViewModel
+
+<div class="row g-0">
+    <!-- Product Image -->
+    <div class="col-md-5">
+        <div style="position: relative; aspect-ratio: 1; background: #f3f4f6;">
+            <img src="@Model.ImagePath"
+                 alt="@Model.ProductName"
+                 style="width: 100%; height: 100%; object-fit: cover;"
+                 onerror="this.src='/images/no-image.jpg'">
+
+            @if (Model.IsOnSale && Model.SavingsPercent > 0)
+            {
+                <span style="position: absolute; top: 12px; left: 12px; background: linear-gradient(135deg, #ef4444, #dc2626);
+                                 color: white; padding: 8px 16px; border-radius: 50px; font-weight: 700; font-size: 14px;">
+                    @Model.SavingsPercent.ToString("F0")% OFF
+                </span>
+            }
+        </div>
+    </div>
+
+    <!-- Product Details -->
+    <div class="col-md-7">
+        <div style="padding: 32px;">
+            <!-- Category -->
+            <div style="color: #10b981; font-size: 12px; font-weight: 600; text-transform: uppercase;
+                        letter-spacing: 0.5px; margin-bottom: 8px;">
+                @Model.CategoryName
+            </div>
+
+            <!-- Product Name -->
+            <h2 style="font-size: 28px; font-weight: 800; color: #111827; margin: 0 0 16px 0;">
+                @Model.ProductName
+            </h2>
+
+            <!-- Price -->
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                @if (Model.IsOnSale && Model.DiscountedPrice < Model.Price)
+                {
+                    <span style="font-size: 32px; font-weight: 800; color: #10b981;">
+                        $@Model.DiscountedPrice.ToString("N2")
+                    </span>
+                    <span style="font-size: 20px; color: #6b7280; text-decoration: line-through;">
+                        $@Model.Price.ToString("N2")
+                    </span>
+                    <span style="background: rgba(239, 68, 68, 0.1); color: #dc2626; padding: 4px 12px;
+                                     border-radius: 6px; font-weight: 600; font-size: 14px;">
+                        Save $@((Model.Price - Model.DiscountedPrice).ToString("N2"))
+                    </span>
+                }
+                else
+                {
+                    <span style="font-size: 32px; font-weight: 800; color: #10b981;">
+                        $@Model.Price.ToString("N2")
+                    </span>
+                }
+            </div>
+
+            <!-- Stock Status -->
+            @if (Model.StockQuantity > 0)
+            {
+                <div style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px;
+                                background: rgba(16, 185, 129, 0.1); border-radius: 8px; margin-bottom: 20px;">
+                    <i class="fas fa-check-circle" style="color: #047857;"></i>
+                    <span style="font-weight: 600; color: #047857; font-size: 14px;">
+                        In Stock (@Model.StockQuantity available)
+                    </span>
+                </div>
+            }
+            else
+            {
+                <div style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px;
+                                background: rgba(239, 68, 68, 0.1); border-radius: 8px; margin-bottom: 20px;">
+                    <i class="fas fa-times-circle" style="color: #dc2626;"></i>
+                    <span style="font-weight: 600; color: #dc2626; font-size: 14px;">
+                        Out of Stock
+                    </span>
+                </div>
+            }
+
+            <!-- Description -->
+            @if (!string.IsNullOrEmpty(Model.Description))
+            {
+                <div style="color: #4b5563; line-height: 1.7; margin-bottom: 24px; font-size: 15px;">
+                    @Model.Description
+                </div>
+            }
+
+            <!-- Buttons -->
+            <div style="display: flex; gap: 12px; margin-top: 32px;">
+                @if (Model.StockQuantity > 0)
+                {
+                    <button onclick="addToCartFromQuickView(@Model.Id, '@Model.ProductName', @Model.DiscountedPrice)"
+                            style="flex: 1; padding: 16px; background: linear-gradient(135deg, #10b981, #059669);
+                                       border: none; border-radius: 12px; color: white; font-weight: 700;
+                                       font-size: 16px; cursor: pointer; transition: all 0.3s;">
+                        <i class="fas fa-cart-plus me-2"></i>
+                        Add to Cart
+                    </button>
+                }
+                else
+                {
+                    <button disabled
+                            style="flex: 1; padding: 16px; background: #d1d5db; border: none;
+                                       border-radius: 12px; color: #6b7280; font-weight: 700; font-size: 16px;">
+                        <i class="fas fa-ban me-2"></i>
+                        Out of Stock
+                    </button>
+                }
+
+                <a href="@Url.Action("Details", "Products", new { id = Model.Id })"
+                   style="padding: 16px 24px; background: white; border: 2px solid #10b981;
+                          border-radius: 12px; color: #10b981; font-weight: 700; text-decoration: none;
+                          display: flex; align-items: center; justify-content: center; transition: all 0.3s;">
+                    <i class="fas fa-eye me-2"></i>
+                    Full Details
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function addToCartFromQuickView(productId, productName, price) {
+        // Use existing addToCart function
+        const button = document.createElement('button');
+        button.setAttribute('data-product-id', productId);
+        button.setAttribute('data-product-name', productName);
+        button.setAttribute('data-product-price', price);
+
+        addToCart(button);
+
+        // Close modal after adding
+        setTimeout(() => {
+            closeQuickView();
+        }, 1500);
+    }
+</script>

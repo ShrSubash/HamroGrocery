@@ -1,0 +1,215 @@
+﻿@model HamroGrocery.Models.ViewModels.SalesReportViewModel
+
+@{
+    ViewData["Title"] = "Sales Report";
+}
+
+<div class="container-fluid px-4 py-4">
+    <!-- Page Header with Date Filter -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">
+                <i class="fas fa-chart-line text-danger"></i> Sales Report
+            </h1>
+            <p class="text-muted mb-0">@Model.StartDate.ToString("MMM dd, yyyy") - @Model.EndDate.ToString("MMM dd, yyyy")</p>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <a asp-action="ExportSalesReport"
+               asp-route-startDate="@Model.StartDate.ToString("yyyy-MM-dd")"
+               asp-route-endDate="@Model.EndDate.ToString("yyyy-MM-dd")"
+               class="btn btn-success">
+                <i class="fas fa-file-excel"></i> Export to Excel
+            </a>
+        </div>
+    </div>
+
+    <!-- Date Range Filter -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form asp-action="Sales" method="get" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label">Start Date</label>
+                    <input type="date" name="startDate" class="form-control"
+                           value="@Model.StartDate.ToString("yyyy-MM-dd")" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">End Date</label>
+                    <input type="date" name="endDate" class="form-control"
+                           value="@Model.EndDate.ToString("yyyy-MM-dd")" required>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i> Generate Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+}
+
+    <!-- Summary Metrics -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4 col-lg-2">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <p class="text-muted mb-1 small">Total Revenue</p>
+                    <h4 class="mb-0 fw-bold text-success">$@Model.TotalRevenue.ToString("N2")</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <p class="text-muted mb-1 small">Total Orders</p>
+                    <h4 class="mb-0 fw-bold">@Model.TotalOrders</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <p class="text-muted mb-1 small">Avg Order Value</p>
+                    <h4 class="mb-0 fw-bold">$@Model.AverageOrderValue.ToString("N2")</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <p class="text-muted mb-1 small">Items Sold</p>
+                    <h4 class="mb-0 fw-bold">@Model.TotalItemsSold</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <p class="text-muted mb-1 small">Customers</p>
+                    <h4 class="mb-0 fw-bold">@Model.UniqueCustomers</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <p class="text-muted mb-1 small">Cash Orders</p>
+                    <h4 class="mb-0 fw-bold text-success">@Model.CashOrdersCount</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Daily Sales Trend -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0"><i class="fas fa-chart-line text-primary"></i> Daily Sales Trend</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="dailySalesChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Methods -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0"><i class="fas fa-credit-card text-success"></i> Payment Methods</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="paymentChart" height="300"></canvas>
+                    <div class="mt-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span><i class="fas fa-circle text-success"></i> Cash on Delivery</span>
+                            <strong>$@Model.CashPayments.ToString("N2")</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span><i class="fas fa-circle text-primary"></i> Online Payment</span>
+                            <strong>$@Model.OnlinePayments.ToString("N2")</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Status Breakdown -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-0 py-3">
+            <h5 class="mb-0"><i class="fas fa-tasks text-info"></i> Order Status Breakdown</h5>
+        </div>
+        <div class="card-body">
+            <canvas id="orderStatusChart" height="120"></canvas>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Top Products -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0"><i class="fas fa-fire text-danger"></i> Top Selling Products</h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.TopProducts.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Product</th>
+                                        <th class="text-end">Qty</th>
+                                        <th class="text-end">Revenue</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var product in Model.TopProducts.Take(10))
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="@product.ImagePath" alt="@product.ProductName"
+                                                         class="rounded me-2" style="width: 35px; height: 35px; object-fit: cover;">
+                                                    <div>
+                                                        <div class="small">@product.ProductName</div>
+                                                        <small class="text-muted">@product.CategoryName</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-end">@product.QuantitySold</td>
+                                            <td class="text-end text-success"><strong>$@product.Revenue.ToString("N2")</strong></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-box-open fa-3x mb-3"></i>
+                            <p>No sales data</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Categories -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0"><i class="fas fa-layer-group text-primary"></i> Top Categories</h5>
+                </div>

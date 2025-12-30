@@ -1,0 +1,307 @@
+﻿@model HamroGrocery.Models.ViewModels.EndOfDayReportViewModel
+
+@{
+    ViewData["Title"] = "End of Day Report";
+}
+
+<div class="container-fluid px-4 py-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">
+                <i class="fas fa-calendar-day text-primary"></i> End of Day Report
+            </h1>
+            <p class="text-muted mb-0">@Model.ReportDate.ToString("MMMM dd, yyyy")</p>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-arrow-left"></i> Back to Reports
+            </a>
+            <a asp-action="ExportEndOfDayReport" asp-route-date="@Model.ReportDate" class="btn btn-success">
+                <i class="fas fa-file-excel"></i> Export to Excel
+            </a>
+        </div>
+    </div>
+
+    <!-- Key Metrics Cards -->
+    <div class="row g-3 mb-4">
+        <!-- Total Sales -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1 small">Total Sales</p>
+                            <h3 class="mb-0 fw-bold">$@Model.TodayTotalSales.ToString("N2")</h3>
+                            @if (Model.SalesGrowthPercentage != 0)
+                            {
+                                <small class="@(Model.SalesGrowthPercentage > 0 ? "text-success" : "text-danger")">
+                                    <i class="fas fa-arrow-@(Model.SalesGrowthPercentage > 0 ? "up" : "down")"></i>
+                                    @Math.Abs(Model.SalesGrowthPercentage).ToString("N1")% vs yesterday
+                                </small>
+                            }
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-dollar-sign text-primary fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Orders -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1 small">Total Orders</p>
+                            <h3 class="mb-0 fw-bold">@Model.TodayTotalOrders</h3>
+                            <small class="text-muted">@Model.AverageOrderValue.ToString("C") avg</small>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-shopping-cart text-success fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Items Sold -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1 small">Items Sold</p>
+                            <h3 class="mb-0 fw-bold">@Model.TotalItemsSold</h3>
+                            <small class="text-muted">units</small>
+                        </div>
+                        <div class="bg-info bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-boxes text-info fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Low Stock Alerts -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1 small">Low Stock</p>
+                            <h3 class="mb-0 fw-bold text-warning">@Model.LowStockItems.Count</h3>
+                            <small class="text-danger">Needs attention</small>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-exclamation-triangle text-warning fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Payment Methods & Order Status -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0"><i class="fas fa-credit-card text-primary"></i> Payment Methods</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="paymentMethodChart" height="250"></canvas>
+                    <div class="mt-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span><i class="fas fa-circle text-success"></i> Cash on Delivery</span>
+                            <strong>$@Model.CashPayments.ToString("N2") (@Model.CashOrdersCount orders)</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span><i class="fas fa-circle text-primary"></i> Online Payment</span>
+                            <strong>$@Model.OnlinePayments.ToString("N2") (@Model.OnlineOrdersCount orders)</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Status Breakdown -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0"><i class="fas fa-tasks text-primary"></i> Order Status</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Pending</span>
+                            <strong class="text-warning">@Model.PendingOrders</strong>
+                        </div>
+                        <div class="progress mb-3" style="height: 8px;">
+                            <div class="progress-bar bg-warning" style="width: @((Model.TodayTotalOrders > 0 ? (Model.PendingOrders * 100.0 / Model.TodayTotalOrders) : 0))%"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Processing</span>
+                            <strong class="text-info">@Model.ProcessingOrders</strong>
+                        </div>
+                        <div class="progress mb-3" style="height: 8px;">
+                            <div class="progress-bar bg-info" style="width: @((Model.TodayTotalOrders > 0 ? (Model.ProcessingOrders * 100.0 / Model.TodayTotalOrders) : 0))%"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Completed</span>
+                            <strong class="text-success">@Model.CompletedOrders</strong>
+                        </div>
+                        <div class="progress mb-3" style="height: 8px;">
+                            <div class="progress-bar bg-success" style="width: @((Model.TodayTotalOrders > 0 ? (Model.CompletedOrders * 100.0 / Model.TodayTotalOrders) : 0))%"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Cancelled</span>
+                            <strong class="text-danger">@Model.CancelledOrders</strong>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-danger" style="width: @((Model.TodayTotalOrders > 0 ? (Model.CancelledOrders * 100.0 / Model.TodayTotalOrders) : 0))%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Products Today -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-0 py-3">
+            <h5 class="mb-0"><i class="fas fa-fire text-danger"></i> Top Selling Products Today</h5>
+        </div>
+        <div class="card-body p-0">
+            @if (Model.TopProducts.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th class="text-end">Qty Sold</th>
+                                <th class="text-end">Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var product in Model.TopProducts)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="@product.ImagePath" alt="@product.ProductName"
+                                                 class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                            <span>@product.ProductName</span>
+                                        </div>
+                                    </td>
+                                    <td>@product.CategoryName</td>
+                                    <td class="text-end"><strong>@product.QuantitySold</strong></td>
+                                    <td class="text-end text-success"><strong>$@product.Revenue.ToString("N2")</strong></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5 text-muted">
+                    <i class="fas fa-box-open fa-3x mb-3"></i>
+                    <p>No sales today</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Low Stock Alerts -->
+    @if (Model.LowStockItems.Any())
+    {
+        <div class="card border-0 shadow-sm border-warning border-start border-4">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0"><i class="fas fa-exclamation-triangle text-warning"></i> Low Stock Alerts</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th class="text-end">Current Stock</th>
+                                <th class="text-end">Reorder Point</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.LowStockItems)
+                            {
+                                <tr>
+                                    <td>@item.ProductName</td>
+                                    <td>@item.CategoryName</td>
+                                    <td class="text-end"><strong class="text-danger">@item.CurrentStock</strong></td>
+                                    <td class="text-end">@item.ReorderPoint</td>
+                                    <td>
+                                        <span class="badge bg-warning">@item.StockStatus</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Payment Method Chart
+        const paymentCtx = document.getElementById('paymentMethodChart').getContext('2d');
+        new Chart(paymentCtx, {
+            type: 'doughnut',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.PaymentMethodChart.Labels)),
+                datasets: [{
+                    data: @Html.Raw(Json.Serialize(Model.PaymentMethodChart.Data)),
+                    backgroundColor: @Html.Raw(Json.Serialize(Model.PaymentMethodChart.BackgroundColors))
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .bg-opacity-10 {
+            opacity: 0.1;
+        }
+
+        .table > :not(caption) > * > * {
+            padding: 1rem 0.75rem;
+        }
+    </style>
+}
+

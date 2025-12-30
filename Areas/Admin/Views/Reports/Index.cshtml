@@ -1,23 +1,291 @@
-﻿@{
-    ViewData["Title"] = "Reports";
+﻿@model HamroGrocery.Models.ViewModels.EndOfDayReportViewModel
+
+@{
+    ViewData["Title"] = "Reports & Analytics";
 }
-<div class="report-actions d-flex flex-wrap gap-3">
-    <a asp-area="Admin" asp-controller="Reports" asp-action="Daily" class="btn btn-outline-primary">
-        <i class="fas fa-calendar-day"></i> End of Day
-    </a>
-    <a asp-area="Admin" asp-controller="Reports" asp-action="Weekly" class="btn btn-outline-primary">
-        <i class="fas fa-calendar-week"></i> Weekly Report
-    </a>
-    <a asp-area="Admin" asp-controller="Reports" asp-action="Monthly" class="btn btn-outline-primary">
-        <i class="fas fa-calendar-alt"></i> Monthly Report
-    </a>
-    <a asp-area="Admin" asp-controller="Reports" asp-action="Yearly" class="btn btn-outline-primary">
-        <i class="fas fa-calendar"></i> Yearly Report
-    </a>
-    <a asp-area="Admin" asp-controller="Reports" asp-action="Inventory" class="btn btn-outline-secondary">
-        <i class="fas fa-boxes"></i> Inventory Report
-    </a>
-    <a asp-area="Admin" asp-controller="Reports" asp-action="Sales" class="btn btn-outline-success">
-        <i class="fas fa-chart-line"></i> Sales Report
-    </a>
+
+<div class="container-fluid px-4 py-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">
+            <i class="fas fa-chart-bar text-primary"></i> Reports & Analytics
+        </h1>
+        <div class="text-muted">
+            <i class="far fa-calendar-alt"></i> @DateTime.Today.ToString("MMMM dd, yyyy")
+        </div>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["WarningMessage"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle"></i> @TempData["WarningMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Quick Stats Cards (Today's Summary) -->
+    @if (Model != null)
+    {
+        <div class="row g-3 mb-4">
+            <!-- Today's Sales -->
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small">Today's Sales</p>
+                                <h3 class="mb-0 fw-bold">$@Model.TodayTotalSales.ToString("N2")</h3>
+                                @if (Model.SalesGrowthPercentage != 0)
+                                {
+                                    <small class="@(Model.SalesGrowthPercentage > 0 ? "text-success" : "text-danger")">
+                                        <i class="fas fa-arrow-@(Model.SalesGrowthPercentage > 0 ? "up" : "down")"></i>
+                                        @Math.Abs(Model.SalesGrowthPercentage).ToString("N1")% vs yesterday
+                                    </small>
+                                }
+                            </div>
+                            <div class="bg-primary bg-opacity-10 p-3 rounded">
+                                <i class="fas fa-dollar-sign text-primary fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Today's Orders -->
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small">Today's Orders</p>
+                                <h3 class="mb-0 fw-bold">@Model.TodayTotalOrders</h3>
+                                <small class="text-muted">@Model.AverageOrderValue.ToString("C") avg</small>
+                            </div>
+                            <div class="bg-success bg-opacity-10 p-3 rounded">
+                                <i class="fas fa-shopping-cart text-success fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Items Sold -->
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small">Items Sold Today</p>
+                                <h3 class="mb-0 fw-bold">@Model.TotalItemsSold</h3>
+                                <small class="text-muted">@Model.TodayTotalOrders orders</small>
+                            </div>
+                            <div class="bg-info bg-opacity-10 p-3 rounded">
+                                <i class="fas fa-boxes text-info fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Low Stock Alerts -->
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small">Low Stock Alerts</p>
+                                <h3 class="mb-0 fw-bold">@Model.LowStockItems.Count</h3>
+                                <small class="text-danger">Needs attention</small>
+                            </div>
+                            <div class="bg-warning bg-opacity-10 p-3 rounded">
+                                <i class="fas fa-exclamation-triangle text-warning fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Report Navigation Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <h5 class="mb-3">
+                <i class="fas fa-file-alt"></i> Generate Reports
+            </h5>
+        </div>
+
+        <!-- End of Day Report -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm h-100 hover-shadow">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-primary bg-opacity-10 p-3 rounded me-3">
+                            <i class="fas fa-calendar-day text-primary fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0">End of Day</h5>
+                            <small class="text-muted">Daily performance snapshot</small>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-3">
+                        View today's sales, orders, payment methods, and top products.
+                    </p>
+                    <a asp-area="Admin" asp-controller="Reports" asp-action="EndOfDay"
+                       class="btn btn-outline-primary w-100">
+                        <i class="fas fa-arrow-right"></i> View Report
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly Report -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm h-100 hover-shadow">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-success bg-opacity-10 p-3 rounded me-3">
+                            <i class="fas fa-calendar-week text-success fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0">Weekly Report</h5>
+                            <small class="text-muted">Last 7 days analysis</small>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-3">
+                        Compare this week vs last week with daily trends and category breakdown.
+                    </p>
+                    <a asp-area="Admin" asp-controller="Reports" asp-action="Weekly"
+                       class="btn btn-outline-success w-100">
+                        <i class="fas fa-arrow-right"></i> View Report
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Report -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm h-100 hover-shadow">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-info bg-opacity-10 p-3 rounded me-3">
+                            <i class="fas fa-calendar-alt text-info fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0">Monthly Report</h5>
+                            <small class="text-muted">Month-over-month insights</small>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-3">
+                        Analyze monthly performance with top/worst products and category sales.
+                    </p>
+                    <a asp-area="Admin" asp-controller="Reports" asp-action="Monthly"
+                       class="btn btn-outline-info w-100">
+                        <i class="fas fa-arrow-right"></i> View Report
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Yearly Report -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm h-100 hover-shadow">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-warning bg-opacity-10 p-3 rounded me-3">
+                            <i class="fas fa-calendar text-warning fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0">Yearly Report</h5>
+                            <small class="text-muted">Annual performance review</small>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-3">
+                        Complete year analysis with quarterly breakdown and growth metrics.
+                    </p>
+                    <a asp-area="Admin" asp-controller="Reports" asp-action="Yearly"
+                       class="btn btn-outline-warning w-100">
+                        <i class="fas fa-arrow-right"></i> View Report
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventory Report -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm h-100 hover-shadow">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-secondary bg-opacity-10 p-3 rounded me-3">
+                            <i class="fas fa-boxes text-secondary fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0">Inventory Report</h5>
+                            <small class="text-muted">Stock levels & alerts</small>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-3">
+                        Monitor stock levels, low stock items, and inventory value by category.
+                    </p>
+                    <a asp-area="Admin" asp-controller="Reports" asp-action="Inventory"
+                       class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-arrow-right"></i> View Report
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales Report (Custom Range) -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm h-100 hover-shadow">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-danger bg-opacity-10 p-3 rounded me-3">
+                            <i class="fas fa-chart-line text-danger fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0">Sales Report</h5>
+                            <small class="text-muted">Custom date range</small>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-3">
+                        Detailed sales analysis with custom date filters and export options.
+                    </p>
+                    <a asp-area="Admin" asp-controller="Reports" asp-action="Sales"
+                       class="btn btn-outline-danger w-100">
+                        <i class="fas fa-arrow-right"></i> View Report
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Styles {
+    <style>
+        .hover-shadow {
+            transition: all 0.3s ease;
+        }
+
+            .hover-shadow:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+            }
+
+        .card {
+            border-radius: 0.5rem;
+        }
+
+        .bg-opacity-10 {
+            opacity: 0.1;
+        }
+    </style>
+}

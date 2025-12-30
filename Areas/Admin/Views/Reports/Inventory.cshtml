@@ -1,0 +1,463 @@
+﻿@model HamroGrocery.Models.ViewModels.InventoryReportViewModel
+
+@{
+    ViewData["Title"] = "Inventory Report";
+}
+
+<div class="container-fluid px-4 py-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">
+                <i class="fas fa-boxes text-secondary"></i> Inventory Report
+            </h1>
+            <p class="text-muted mb-0">As of @Model.ReportDate.ToString("MMMM dd, yyyy")</p>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-arrow-left"></i> Back to Reports
+            </a>
+            <a asp-action="ExportInventoryReport" class="btn btn-success">
+                <i class="fas fa-file-excel"></i> Export to Excel
+            </a>
+        </div>
+    </div>
+
+    <!-- Key Metrics Cards -->
+    <div class="row g-3 mb-4">
+        <!-- Total Products -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1 small">Total Products</p>
+                            <h3 class="mb-0 fw-bold">@Model.TotalProducts</h3>
+                            <small class="text-success">@Model.ActiveProducts active</small>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-box text-primary fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- In Stock -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1 small">In Stock</p>
+                            <h3 class="mb-0 fw-bold text-success">@Model.InStockProducts</h3>
+                            <small class="text-muted">products</small>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-check-circle text-success fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Low Stock -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1 small">Low Stock</p>
+                            <h3 class="mb-0 fw-bold text-warning">@Model.LowStockProducts</h3>
+                            <small class="text-danger">Need reorder</small>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-exclamation-triangle text-warning fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Stock Value -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1 small">Total Stock Value</p>
+                            <h3 class="mb-0 fw-bold">$@Model.TotalStockValue.ToString("N2")</h3>
+                            <small class="text-muted">inventory worth</small>
+                        </div>
+                        <div class="bg-info bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-dollar-sign text-info fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Stock Level Distribution -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie text-primary"></i> Stock Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="stockLevelChart" height="250"></canvas>
+                    <div class="mt-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span><i class="fas fa-circle text-success"></i> In Stock</span>
+                            <strong>@Model.InStockProducts</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span><i class="fas fa-circle text-warning"></i> Low Stock</span>
+                            <strong>@Model.LowStockProducts</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span><i class="fas fa-circle text-danger"></i> Out of Stock</span>
+                            <strong>@Model.OutOfStockProducts</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span><i class="fas fa-circle text-info"></i> Overstock</span>
+                            <strong>@Model.OverstockProducts</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Stock Value -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar text-info"></i> Stock Value by Category</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="categoryStockChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category-wise Inventory -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-0 py-3">
+            <h5 class="mb-0"><i class="fas fa-layer-group text-primary"></i> Category-wise Inventory</h5>
+        </div>
+        <div class="card-body p-0">
+            @if (Model.CategoryInventory.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Category</th>
+                                <th class="text-end">Products</th>
+                                <th class="text-end">Total Stock</th>
+                                <th class="text-end">Stock Value</th>
+                                <th class="text-end">Low Stock</th>
+                                <th class="text-end">Out of Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var category in Model.CategoryInventory)
+                            {
+                                <tr>
+                                    <td><strong>@category.CategoryName</strong></td>
+                                    <td class="text-end">@category.ProductCount</td>
+                                    <td class="text-end">@category.TotalStock</td>
+                                    <td class="text-end text-success"><strong>$@category.TotalValue.ToString("N2")</strong></td>
+                                    <td class="text-end">
+                                        @if (category.LowStockCount > 0)
+                                        {
+                                            <span class="badge bg-warning">@category.LowStockCount</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        @if (category.OutOfStockCount > 0)
+                                        {
+                                            <span class="badge bg-danger">@category.OutOfStockCount</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Low Stock Items -->
+    @if (Model.LowStockItems.Any())
+    {
+        <div class="card border-0 shadow-sm border-warning border-start border-4 mb-4">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0"><i class="fas fa-exclamation-triangle text-warning"></i> Low Stock Items - Needs Reorder</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>SKU</th>
+                                <th class="text-end">Current Stock</th>
+                                <th class="text-end">Reorder Point</th>
+                                <th class="text-end">Unit Price</th>
+                                <th class="text-end">Stock Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.LowStockItems)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="@item.ImagePath" alt="@item.ProductName"
+                                                 class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                            <span>@item.ProductName</span>
+                                        </div>
+                                    </td>
+                                    <td>@item.CategoryName</td>
+                                    <td><code>@item.SKU</code></td>
+                                    <td class="text-end">
+                                        <span class="badge bg-warning text-dark">@item.CurrentStock</span>
+                                    </td>
+                                    <td class="text-end">@item.ReorderPoint</td>
+                                    <td class="text-end">$@item.UnitPrice.ToString("N2")</td>
+                                    <td class="text-end text-success">$@item.TotalValue.ToString("N2")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Out of Stock Items -->
+    @if (Model.OutOfStockItems.Any())
+    {
+        <div class="card border-0 shadow-sm border-danger border-start border-4 mb-4">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0"><i class="fas fa-times-circle text-danger"></i> Out of Stock Items - Urgent Action Required</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>SKU</th>
+                                <th class="text-end">Reorder Point</th>
+                                <th class="text-end">Unit Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.OutOfStockItems)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="@item.ImagePath" alt="@item.ProductName"
+                                                 class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                            <span>@item.ProductName</span>
+                                        </div>
+                                    </td>
+                                    <td>@item.CategoryName</td>
+                                    <td><code>@item.SKU</code></td>
+                                    <td class="text-end">@item.ReorderPoint</td>
+                                    <td class="text-end">$@item.UnitPrice.ToString("N2")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Overstock Items -->
+    @if (Model.OverstockItems.Any())
+    {
+        <div class="card border-0 shadow-sm border-info border-start border-4 mb-4">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0"><i class="fas fa-boxes text-info"></i> Overstock Items - Consider Promotion</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th class="text-end">Current Stock</th>
+                                <th class="text-end">Max Level</th>
+                                <th class="text-end">Excess</th>
+                                <th class="text-end">Stock Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.OverstockItems)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="@item.ImagePath" alt="@item.ProductName"
+                                                 class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                            <span>@item.ProductName</span>
+                                        </div>
+                                    </td>
+                                    <td>@item.CategoryName</td>
+                                    <td class="text-end"><strong>@item.CurrentStock</strong></td>
+                                    <td class="text-end">@item.MaxStockLevel</td>
+                                    <td class="text-end">
+                                        <span class="badge bg-info">+@(item.CurrentStock - item.MaxStockLevel)</span>
+                                    </td>
+                                    <td class="text-end text-success">$@item.TotalValue.ToString("N2")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Top Value Products -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+            <h5 class="mb-0"><i class="fas fa-gem text-success"></i> Top 10 Products by Stock Value</h5>
+        </div>
+        <div class="card-body p-0">
+            @if (Model.TopValueProducts.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Rank</th>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th class="text-end">Stock</th>
+                                <th class="text-end">Unit Price</th>
+                                <th class="text-end">Total Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.TopValueProducts.Count; i++)
+                            {
+                                var item = Model.TopValueProducts[i];
+                                <tr>
+                                    <td>
+                                        @if (i < 3)
+                                        {
+                                            <span class="badge bg-warning text-dark">#@(i + 1)</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">#@(i + 1)</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="@item.ImagePath" alt="@item.ProductName"
+                                                 class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                            <span>@item.ProductName</span>
+                                        </div>
+                                    </td>
+                                    <td>@item.CategoryName</td>
+                                    <td class="text-end">@item.CurrentStock</td>
+                                    <td class="text-end">$@item.UnitPrice.ToString("N2")</td>
+                                    <td class="text-end text-success"><strong>$@item.TotalValue.ToString("N2")</strong></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Stock Level Distribution Chart
+        const stockLevelCtx = document.getElementById('stockLevelChart').getContext('2d');
+        new Chart(stockLevelCtx, {
+            type: 'doughnut',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.StockLevelChart.Labels)),
+                datasets: [{
+                    data: @Html.Raw(Json.Serialize(Model.StockLevelChart.Data)),
+                    backgroundColor: @Html.Raw(Json.Serialize(Model.StockLevelChart.BackgroundColors))
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Category Stock Value Chart
+        const categoryStockCtx = document.getElementById('categoryStockChart').getContext('2d');
+        new Chart(categoryStockCtx, {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.CategoryStockValueChart.Labels)),
+                datasets: [{
+                    label: 'Stock Value',
+                    data: @Html.Raw(Json.Serialize(Model.CategoryStockValueChart.Data)),
+                    backgroundColor: @Html.Raw(Json.Serialize(Model.CategoryStockValueChart.BackgroundColors))
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .bg-opacity-10 {
+            opacity: 0.1;
+        }
+    </style>
+}

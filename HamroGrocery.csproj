@@ -9,11 +9,21 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <None Include="Models\GuestCheckoutInfo.cs" />
+	  <None Include="Models\ViewModels\InventoryReportViewModel.cs" />
+	  <None Include="Models\ViewModels\EndOfDayReportViewModel.cs" />
+	  <None Include="Models\ViewModels\WeeklyReportViewModel.cs" />
+	  <None Include="Models\ViewModels\MonthlyReportViewModel.cs" />
+	  <None Include="Models\ViewModels\YearlyReportViewModel.cs" />
+	  <None Include="Models\ViewModels\SalesChartDataDto.cs" />
+	  <None Include="Models\ViewModels\ReportExportDto.cs" />
+	  <None Include="Models\ViewModels\SalesReportViewModel.cs" />
 	  <None Include="wwwroot\css\admin-modern.css" />
 	  <None Include="wwwroot\js\admin-modern.js" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+		<PackageReference Include="ClosedXML" Version="0.102.2" />
+		<PackageReference Include="CsvHelper" Version="30.0.1" />
 		<PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.9" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.9" />

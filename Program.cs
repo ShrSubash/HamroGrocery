@@ -197,6 +197,7 @@ builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IUserStatisticsService, UserStatisticsService>();
 // Payment Services
 builder.Services.AddScoped<IPaymentService, StripePaymentService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 
 // Future services can be added here:
 // builder.Services.AddScoped<IOrderService, OrderService>();

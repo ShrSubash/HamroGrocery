@@ -34,28 +34,27 @@ namespace HamroGrocery.Areas.Admin.Controllers
                 var startOfLastMonth = startOfMonth.AddMonths(-1);
                 var endOfLastMonth = startOfMonth.AddDays(-1);
 
-                // Completed order statuses
-                var completedStatuses = new[] { OrderStatus.Completed, OrderStatus.Delivered };
-
-                // Total Revenue (all time)
+                // Total Revenue
                 viewModel.TotalRevenue = await _context.Orders
-                    .Where(o => completedStatuses.Contains(o.Status))
+                    .Where(o => o.Status == OrderStatus.Completed || o.Status == OrderStatus.Delivered)
                     .SumAsync(o => (decimal?)o.TotalAmount) ?? 0;
 
                 // Today's Revenue
                 viewModel.TodayRevenue = await _context.Orders
-                    .Where(o => o.OrderDate.Date == today && completedStatuses.Contains(o.Status))
+                    .Where(o => o.OrderDate.Date == today &&
+                           (o.Status == OrderStatus.Completed || o.Status == OrderStatus.Delivered))
                     .SumAsync(o => (decimal?)o.TotalAmount) ?? 0;
 
                 // This Month's Revenue
                 viewModel.MonthRevenue = await _context.Orders
-                    .Where(o => o.OrderDate >= startOfMonth && completedStatuses.Contains(o.Status))
+                    .Where(o => o.OrderDate >= startOfMonth &&
+                           (o.Status == OrderStatus.Completed || o.Status == OrderStatus.Delivered))
                     .SumAsync(o => (decimal?)o.TotalAmount) ?? 0;
 
-                // Last Month's Revenue (for growth calculation)
+                // Last Month's Revenue
                 var lastMonthRevenue = await _context.Orders
                     .Where(o => o.OrderDate >= startOfLastMonth && o.OrderDate <= endOfLastMonth &&
-                               completedStatuses.Contains(o.Status))
+                           (o.Status == OrderStatus.Completed || o.Status == OrderStatus.Delivered))
                     .SumAsync(o => (decimal?)o.TotalAmount) ?? 0;
 
                 // Calculate Revenue Growth
@@ -81,13 +80,13 @@ namespace HamroGrocery.Areas.Admin.Controllers
                     viewModel.AverageOrderValue = viewModel.TotalRevenue / viewModel.TotalOrders;
                 }
 
-                // Total Customers - count distinct customer IDs from orders
+                // Total Customers
                 viewModel.TotalCustomers = await _context.Orders
                     .Select(o => o.CustomerId)
                     .Distinct()
                     .CountAsync();
 
-                // New Customers This Month - customers who placed their first order this month
+                // New Customers This Month
                 var customersThisMonth = await _context.Orders
                     .Where(o => o.OrderDate >= startOfMonth)
                     .Select(o => o.CustomerId)
@@ -104,56 +103,60 @@ namespace HamroGrocery.Areas.Admin.Controllers
                     .Except(customersBeforeThisMonth)
                     .Count();
 
-                // Top Selling Products (Top 5)
+                // Get completed order IDs
+                var completedOrderIds = await _context.Orders
+                    .Where(o => o.Status == OrderStatus.Completed || o.Status == OrderStatus.Delivered)
+                    .Select(o => o.Id)
+                    .ToListAsync();
+
+                // Top Selling Products
                 viewModel.TopSellingProducts = await _context.OrderItems
-                    .Include(oi => oi.ProductVariation)
-                        .ThenInclude(pv => pv.Product)
-                            .ThenInclude(p => p.Category)
-                    .Where(oi => completedStatuses.Contains(oi.Order.Status))
+                    .Include(oi => oi.Product)
+                        .ThenInclude(p => p.Category)
+                    .Where(oi => completedOrderIds.Contains(oi.OrderId))
                     .GroupBy(oi => new
                     {
-                        oi.ProductVariation.ProductId,
-                        oi.ProductVariation.Product.ProductName,
-                        oi.ProductVariation.Product.ImagePath,
-                        CategoryName = oi.ProductVariation.Product.Category.CategoryName
+                        oi.ProductId,
+                        oi.ProductName,
+                        oi.Product.ImagePath,
+                        CategoryName = oi.CategoryName ?? "Uncategorized"
                     })
                     .Select(g => new TopProductViewModel
                     {
                         ProductId = g.Key.ProductId,
                         ProductName = g.Key.ProductName,
-                        ImagePath = g.Key.ImagePath,
+                        ImagePath = g.Key.ImagePath ?? "/images/placeholder-product.jpg",
                         CategoryName = g.Key.CategoryName,
                         QuantitySold = g.Sum(oi => oi.Quantity),
-                        Revenue = g.Sum(oi => oi.Quantity * oi.UnitPrice)
+                        Revenue = g.Sum(oi => oi.TotalPrice)
                     })
                     .OrderByDescending(p => p.Revenue)
                     .Take(5)
                     .ToListAsync();
 
-                // Top Categories (Top 5)
+                // Total Category Revenue
                 var totalCategoryRevenue = await _context.OrderItems
-                    .Include(oi => oi.ProductVariation.Product.Category)
-                    .Where(oi => completedStatuses.Contains(oi.Order.Status))
-                    .SumAsync(oi => (decimal?)(oi.Quantity * oi.UnitPrice)) ?? 0;
+                    .Where(oi => completedOrderIds.Contains(oi.OrderId))
+                    .SumAsync(oi => (decimal?)oi.TotalPrice) ?? 0;
 
+                // Top Categories
                 viewModel.TopCategories = await _context.OrderItems
-                    .Include(oi => oi.ProductVariation)
-                        .ThenInclude(pv => pv.Product)
-                            .ThenInclude(p => p.Category)
-                    .Where(oi => completedStatuses.Contains(oi.Order.Status))
+                    .Include(oi => oi.Product)
+                        .ThenInclude(p => p.Category)
+                    .Where(oi => completedOrderIds.Contains(oi.OrderId) && oi.CategoryName != null)
                     .GroupBy(oi => new
                     {
-                        oi.ProductVariation.Product.Category.Id,
-                        oi.ProductVariation.Product.Category.CategoryName,
-                        oi.ProductVariation.Product.Category.Icon
+                        CategoryId = oi.Product.CategoryId,
+                        CategoryName = oi.CategoryName,
+                        Icon = oi.Product.Category.Icon
                     })
                     .Select(g => new TopCategoryViewModel
                     {
-                        CategoryId = g.Key.Id,
-                        CategoryName = g.Key.CategoryName,
+                        CategoryId = g.Key.CategoryId,
+                        CategoryName = g.Key.CategoryName ?? "Uncategorized",
                         Icon = g.Key.Icon,
                         ProductsSold = g.Sum(oi => oi.Quantity),
-                        Revenue = g.Sum(oi => oi.Quantity * oi.UnitPrice)
+                        Revenue = g.Sum(oi => oi.TotalPrice)
                     })
                     .OrderByDescending(c => c.Revenue)
                     .Take(5)
@@ -167,58 +170,67 @@ namespace HamroGrocery.Areas.Admin.Controllers
                         : 0;
                 }
 
-                // Recent Orders (Last 10) - FIXED: Using Customer instead of User
+                // Recent Orders
                 viewModel.RecentOrders = await _context.Orders
-                    .Include(o => o.Customer)
                     .OrderByDescending(o => o.OrderDate)
                     .Take(10)
                     .Select(o => new RecentOrderViewModel
                     {
                         OrderId = o.Id,
                         OrderNumber = o.OrderNumber,
-                        CustomerName = o.Customer != null
-                            ? (o.Customer.FullName ?? o.Customer.Email)
-                            : (o.CustomerName ?? "Guest Customer"),
+                        CustomerName = o.CustomerName ?? "Guest Customer",
                         TotalAmount = o.TotalAmount,
                         Status = o.Status.ToString(),
                         OrderDate = o.OrderDate
                     })
                     .ToListAsync();
 
-                // Daily Sales for Last 7 Days
+                // ✅ FIXED: Daily Sales for Last 7 Days - Added parentheses
                 var sevenDaysAgo = today.AddDays(-7);
-                viewModel.DailySales = await _context.Orders
-                    .Where(o => o.OrderDate >= sevenDaysAgo && completedStatuses.Contains(o.Status))
-                    .GroupBy(o => o.OrderDate.Date)
+                var dailySalesData = await _context.Orders
+                    .Where(o => o.OrderDate >= sevenDaysAgo &&
+                           (o.Status == OrderStatus.Completed || o.Status == OrderStatus.Delivered)) // ← Parentheses added
+                    .Select(o => new { o.OrderDate.Date, o.TotalAmount })
+                    .ToListAsync();
+
+                var dailyGrouped = dailySalesData
+                    .GroupBy(o => o.Date)
                     .Select(g => new SalesDataPoint
                     {
                         Date = g.Key,
                         Label = g.Key.ToString("MMM dd"),
                         Value = g.Sum(o => o.TotalAmount)
                     })
-                    .OrderBy(s => s.Date)
-                    .ToListAsync();
+                    .ToList();
 
-                // Fill in missing days with zero values
+                // Fill in missing days
                 var allDates = Enumerable.Range(0, 8)
                     .Select(i => today.AddDays(-i))
                     .OrderBy(d => d)
                     .ToList();
 
-                var filledDailySales = allDates.Select(date => new SalesDataPoint
+                viewModel.DailySales = allDates.Select(date => new SalesDataPoint
                 {
                     Date = date,
                     Label = date.ToString("MMM dd"),
-                    Value = viewModel.DailySales.FirstOrDefault(s => s.Date == date)?.Value ?? 0
+                    Value = dailyGrouped.FirstOrDefault(s => s.Date == date)?.Value ?? 0
                 }).ToList();
 
-                viewModel.DailySales = filledDailySales;
-
-                // Monthly Sales for Last 6 Months
+                // ✅ FIXED: Monthly Sales for Last 6 Months - Added parentheses & ToListAsync
                 var sixMonthsAgo = today.AddMonths(-6);
-                viewModel.MonthlySales = await _context.Orders
-                    .Where(o => o.OrderDate >= sixMonthsAgo && completedStatuses.Contains(o.Status))
-                    .GroupBy(o => new { o.OrderDate.Year, o.OrderDate.Month })
+                var monthlyOrdersData = await _context.Orders
+                    .Where(o => o.OrderDate >= sixMonthsAgo &&
+                           (o.Status == OrderStatus.Completed || o.Status == OrderStatus.Delivered)) // ← Parentheses added
+                    .Select(o => new
+                    {
+                        o.OrderDate.Year,
+                        o.OrderDate.Month,
+                        o.TotalAmount
+                    })
+                    .ToListAsync(); // ← Get data first
+
+                viewModel.MonthlySales = monthlyOrdersData
+                    .GroupBy(o => new { o.Year, o.Month })
                     .Select(g => new SalesDataPoint
                     {
                         Date = new DateTime(g.Key.Year, g.Key.Month, 1),
@@ -226,43 +238,44 @@ namespace HamroGrocery.Areas.Admin.Controllers
                         Value = g.Sum(o => o.TotalAmount)
                     })
                     .OrderBy(s => s.Date)
-                    .ToListAsync();
+                    .ToList();
 
                 // Inventory Alerts
-                viewModel.LowStockCount = await _context.ProductVariations
-                    .CountAsync(pv => pv.StockQuantity > 0 && pv.StockQuantity <= pv.ReorderPoint);
+                viewModel.LowStockCount = await _context.Products
+                    .CountAsync(p => p.IsActive && p.StockQuantity > 0 && p.StockQuantity <= p.ReorderPoint);
 
-                viewModel.OutOfStockCount = await _context.ProductVariations
-                    .CountAsync(pv => pv.StockQuantity == 0);
+                viewModel.OutOfStockCount = await _context.Products
+                    .CountAsync(p => p.IsActive && p.StockQuantity == 0);
 
                 return View(viewModel);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading analytics dashboard");
-                TempData["ErrorMessage"] = "An error occurred while loading analytics data.";
+                _logger.LogError(ex, "Error loading analytics dashboard: {Message}", ex.Message);
+                TempData["ErrorMessage"] = $"An error occurred while loading analytics data: {ex.Message}";
                 return View(new AnalyticsDashboardViewModel());
             }
         }
 
-        /// <summary>
-        /// Get chart data for AJAX requests
-        /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetChartData(string period = "daily")
         {
             try
             {
-                var completedStatuses = new[] { OrderStatus.Completed, OrderStatus.Delivered };
-
                 if (period == "daily")
                 {
                     var today = DateTime.Today;
                     var sevenDaysAgo = today.AddDays(-7);
 
-                    var data = await _context.Orders
-                        .Where(o => o.OrderDate >= sevenDaysAgo && completedStatuses.Contains(o.Status))
-                        .GroupBy(o => o.OrderDate.Date)
+                    // ✅ FIXED: Added parentheses around OR condition
+                    var ordersData = await _context.Orders
+                        .Where(o => o.OrderDate >= sevenDaysAgo &&
+                               (o.Status == OrderStatus.Completed || o.Status == OrderStatus.Delivered))
+                        .Select(o => new { o.OrderDate.Date, o.TotalAmount })
+                        .ToListAsync();
+
+                    var data = ordersData
+                        .GroupBy(o => o.Date)
                         .Select(g => new
                         {
                             date = g.Key,
@@ -271,7 +284,7 @@ namespace HamroGrocery.Areas.Admin.Controllers
                             orders = g.Count()
                         })
                         .OrderBy(s => s.date)
-                        .ToListAsync();
+                        .ToList();
 
                     // Fill in missing days
                     var allDates = Enumerable.Range(0, 8)
@@ -294,9 +307,20 @@ namespace HamroGrocery.Areas.Admin.Controllers
                     var today = DateTime.Today;
                     var sixMonthsAgo = today.AddMonths(-6);
 
-                    var data = await _context.Orders
-                        .Where(o => o.OrderDate >= sixMonthsAgo && completedStatuses.Contains(o.Status))
-                        .GroupBy(o => new { o.OrderDate.Year, o.OrderDate.Month })
+                    // ✅ FIXED: Added parentheses and ToListAsync
+                    var ordersData = await _context.Orders
+                        .Where(o => o.OrderDate >= sixMonthsAgo &&
+                               (o.Status == OrderStatus.Completed || o.Status == OrderStatus.Delivered))
+                        .Select(o => new
+                        {
+                            o.OrderDate.Year,
+                            o.OrderDate.Month,
+                            o.TotalAmount
+                        })
+                        .ToListAsync();
+
+                    var data = ordersData
+                        .GroupBy(o => new { o.Year, o.Month })
                         .Select(g => new
                         {
                             date = new DateTime(g.Key.Year, g.Key.Month, 1),
@@ -305,15 +329,15 @@ namespace HamroGrocery.Areas.Admin.Controllers
                             orders = g.Count()
                         })
                         .OrderBy(s => s.date)
-                        .ToListAsync();
+                        .ToList();
 
                     return Json(data);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error fetching chart data");
-                return Json(new { error = "Failed to load chart data" });
+                _logger.LogError(ex, "Error fetching chart data: {Message}", ex.Message);
+                return Json(new { error = "Failed to load chart data", message = ex.Message });
             }
         }
     }
